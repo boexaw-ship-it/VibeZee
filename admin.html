@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin — VibeZee</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="img/logo-32.png"/>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/admin.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body class="admin-body">
+
+  <div class="noise"></div>
+
+  <!-- ── ADMIN LOGIN GATE ── -->
+  <div class="admin-gate" id="adminGate">
+    <div class="gate-bg-grid"></div>
+    <div class="gate-glow"></div>
+    <div class="gate-card">
+      <div class="gate-logo"><span class="logo-vibe">VIBE</span><span class="logo-zee">ZEE</span></div>
+      <div class="gate-badge">⚙ ADMIN PANEL</div>
+      <p class="gate-sub">Restricted access. Authorized personnel only.</p>
+      <div class="form-group">
+        <label class="form-label">ADMIN EMAIL</label>
+        <div class="input-wrap">
+          <span class="input-icon">✉</span>
+          <input type="email" id="gateEmail" placeholder="admin@vibezee.com" class="form-input" autocomplete="email"/>
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:1rem;">
+        <label class="form-label">PASSWORD</label>
+        <div class="input-wrap">
+          <span class="input-icon">🔒</span>
+          <input type="password" id="gatePassword" placeholder="••••••••" class="form-input" autocomplete="current-password"/>
+        </div>
+      </div>
+      <div class="gate-message" id="gateMessage" style="display:none;"></div>
+      <button class="btn-gate" onclick="adminLogin()" id="btnGate">
+        ENTER DASHBOARD →
+      </button>
+    </div>
+  </div>
+
+  <!-- ── ADMIN DASHBOARD ── -->
+  <div class="admin-dashboard" id="adminDashboard" style="display:none;">
+
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar" id="adminSidebar">
+      <div class="sidebar-logo">
+        <span class="logo-vibe">VIBE</span><span class="logo-zee">ZEE</span>
+        <span class="sidebar-badge">ADMIN</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">MAIN</div>
+        <a class="sidebar-link active" data-section="overview" onclick="showSection('overview', this)">
+          <span class="link-icon">📊</span> Overview
+        </a>
+        <a class="sidebar-link" data-section="orders" onclick="showSection('orders', this)">
+          <span class="link-icon">📦</span> Orders
+          <span class="link-badge" id="newOrdersBadge">0</span>
+        </a>
+        <a class="sidebar-link" data-section="products" onclick="showSection('products', this)">
+          <span class="link-icon">🎮</span> Products
+        </a>
+        <a class="sidebar-link" data-section="users" onclick="showSection('users', this)">
+          <span class="link-icon">👥</span> Users
+        </a>
+
+        <div class="nav-section-label" style="margin-top:1.5rem;">ANALYTICS</div>
+        <a class="sidebar-link" data-section="analytics" onclick="showSection('analytics', this)">
+          <span class="link-icon">📈</span> Sales Chart
+        </a>
+
+        <div class="nav-section-label" style="margin-top:1.5rem;">SYSTEM</div>
+        <a class="sidebar-link" href="index.html" target="_blank">
+          <span class="link-icon">🌐</span> View Shop
+        </a>
+        <a class="sidebar-link logout-link" onclick="adminLogout()">
+          <span class="link-icon">🚪</span> Logout
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="admin-avatar">A</div>
+        <div>
+          <div class="admin-name" id="adminName">Admin</div>
+          <div class="admin-role">Super Admin</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="admin-main">
+
+      <!-- TOP BAR -->
+      <header class="admin-topbar">
+        <div class="topbar-left">
+          <button class="sidebar-toggle" onclick="toggleAdminSidebar()">☰</button>
+          <h1 class="topbar-title" id="topbarTitle">Overview</h1>
+        </div>
+        <div class="topbar-right">
+          <div class="topbar-time" id="topbarTime"></div>
+          <div class="topbar-dot"></div>
+          <span class="topbar-status">LIVE</span>
+        </div>
+      </header>
+
+      <!-- ── SECTION: OVERVIEW ── -->
+      <section class="admin-section" id="section-overview">
+
+        <!-- Stat Cards -->
+        <div class="stat-cards">
+          <div class="stat-card">
+            <div class="stat-card-icon">📦</div>
+            <div class="stat-card-info">
+              <div class="stat-card-num" id="statOrders">0</div>
+              <div class="stat-card-label">Total Orders</div>
+            </div>
+            <div class="stat-card-trend up">+12%</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon">💰</div>
+            <div class="stat-card-info">
+              <div class="stat-card-num" id="statRevenue">0</div>
+              <div class="stat-card-label">Revenue (MMK)</div>
+            </div>
+            <div class="stat-card-trend up">+8%</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon">👥</div>
+            <div class="stat-card-info">
+              <div class="stat-card-num" id="statUsers">0</div>
+              <div class="stat-card-label">Customers</div>
+            </div>
+            <div class="stat-card-trend up">+5%</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon">🎮</div>
+            <div class="stat-card-info">
+              <div class="stat-card-num" id="statProducts">36</div>
+              <div class="stat-card-label">Products</div>
+            </div>
+            <div class="stat-card-trend">—</div>
+          </div>
+        </div>
+
+        <!-- Recent Orders + Top Products -->
+        <div class="overview-grid">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h3>RECENT ORDERS</h3>
+              <button class="card-btn" onclick="showSection('orders', document.querySelector('[data-section=orders]'))">View All →</button>
+            </div>
+            <div id="recentOrdersList"></div>
+          </div>
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h3>TOP CATEGORIES</h3>
+            </div>
+            <div id="topCategories"></div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ── SECTION: ORDERS ── -->
+      <section class="admin-section" id="section-orders" style="display:none;">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3>ALL ORDERS</h3>
+            <div class="header-controls">
+              <select class="ctrl-select" id="orderStatusFilter" onchange="renderOrders()">
+                <option value="all">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="processing">Processing</option>
+                <option value="delivered">Delivered</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>ORDER ID</th>
+                  <th>CUSTOMER</th>
+                  <th>ITEMS</th>
+                  <th>TOTAL</th>
+                  <th>PAYMENT</th>
+                  <th>STATUS</th>
+                  <th>ACTION</th>
+                </tr>
+              </thead>
+              <tbody id="ordersTableBody"></tbody>
+            </table>
+          </div>
+          <div class="empty-table" id="ordersEmpty" style="display:none;">
+            <span>📭</span> No orders yet
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SECTION: PRODUCTS ── -->
+      <section class="admin-section" id="section-products" style="display:none;">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3>PRODUCTS</h3>
+            <button class="btn-add" onclick="openProductModal()">+ ADD PRODUCT</button>
+          </div>
+          <div class="product-filter-bar">
+            <input type="text" id="productSearch" placeholder="Search products..." class="ctrl-input" oninput="renderProducts()"/>
+            <select class="ctrl-select" id="productCatFilter" onchange="renderProducts()">
+              <option value="all">All Categories</option>
+              <option value="sound-cards">Sound Cards</option>
+              <option value="microphones">Microphones</option>
+              <option value="earphones">Earphones</option>
+              <option value="keyboards">Keyboards</option>
+              <option value="mouse">Mouse</option>
+              <option value="joysticks">Joysticks</option>
+              <option value="memory">Memory Sticks</option>
+              <option value="harddisk">Hard Disks</option>
+              <option value="usbc">USB Type-C</option>
+            </select>
+          </div>
+          <div class="table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>ICON</th>
+                  <th>NAME</th>
+                  <th>CATEGORY</th>
+                  <th>PRICE</th>
+                  <th>BADGE</th>
+                  <th>ACTION</th>
+                </tr>
+              </thead>
+              <tbody id="productsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SECTION: USERS ── -->
+      <section class="admin-section" id="section-users" style="display:none;">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3>CUSTOMERS</h3>
+            <input type="text" id="userSearch" placeholder="Search users..." class="ctrl-input" oninput="renderUsers()"/>
+          </div>
+          <div class="table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>NAME</th>
+                  <th>PHONE</th>
+                  <th>CITY</th>
+                  <th>ORDERS</th>
+                  <th>TOTAL SPENT</th>
+                  <th>ACTION</th>
+                </tr>
+              </thead>
+              <tbody id="usersTableBody"></tbody>
+            </table>
+          </div>
+          <div class="empty-table" id="usersEmpty" style="display:none;">
+            <span>👤</span> No customers yet
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SECTION: ANALYTICS ── -->
+      <section class="admin-section" id="section-analytics" style="display:none;">
+        <div class="analytics-grid">
+          <div class="admin-card chart-card">
+            <div class="admin-card-header"><h3>MONTHLY REVENUE</h3></div>
+            <canvas id="revenueChart" height="280"></canvas>
+          </div>
+          <div class="admin-card chart-card">
+            <div class="admin-card-header"><h3>ORDERS BY CATEGORY</h3></div>
+            <canvas id="categoryChart" height="280"></canvas>
+          </div>
+        </div>
+        <div class="admin-card" style="margin-top:1.5rem;">
+          <div class="admin-card-header"><h3>WEEKLY ORDERS</h3></div>
+          <canvas id="weeklyChart" height="120"></canvas>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ── PRODUCT MODAL ── -->
+  <div class="modal-overlay" id="productModal" style="display:none;" onclick="closeModalOutside(event)">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modalTitle">ADD PRODUCT</h3>
+        <button class="modal-close" onclick="closeProductModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="modalProductId"/>
+        <div class="modal-grid">
+          <div class="form-group modal-full">
+            <label class="form-label">PRODUCT NAME *</label>
+            <input type="text" id="modalName" placeholder="Product name..." class="form-input"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">CATEGORY *</label>
+            <select id="modalCat" class="form-input">
+              <option value="">Select...</option>
+              <option value="sound-cards">Sound Cards</option>
+              <option value="microphones">Microphones</option>
+              <option value="earphones">Earphones</option>
+              <option value="keyboards">Keyboards</option>
+              <option value="mouse">Mouse</option>
+              <option value="joysticks">Joysticks</option>
+              <option value="memory">Memory Sticks</option>
+              <option value="harddisk">Hard Disks</option>
+              <option value="usbc">USB Type-C</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">PRICE (MMK) *</label>
+            <input type="number" id="modalPrice" placeholder="0" class="form-input"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">ICON (emoji)</label>
+            <input type="text" id="modalIcon" placeholder="🎮" class="form-input"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">BADGE</label>
+            <select id="modalBadge" class="form-input">
+              <option value="">None</option>
+              <option value="HOT">HOT</option>
+              <option value="NEW">NEW</option>
+              <option value="SALE">SALE</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-modal-cancel" onclick="closeProductModal()">CANCEL</button>
+        <button class="btn-modal-save" onclick="saveProduct()">SAVE PRODUCT</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ORDER DETAIL MODAL ── -->
+  <div class="modal-overlay" id="orderModal" style="display:none;" onclick="closeModalOutside(event)">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>ORDER DETAIL</h3>
+        <button class="modal-close" onclick="closeOrderModal()">✕</button>
+      </div>
+      <div class="modal-body" id="orderModalBody"></div>
+      <div class="modal-footer">
+        <button class="btn-modal-cancel" onclick="closeOrderModal()">CLOSE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="js/main.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

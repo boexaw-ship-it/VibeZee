@@ -1,0 +1,22 @@
+{
+  "name": "VibeZee",
+  "short_name": "VibeZee",
+  "description": "Gaming Peripherals & Accessories Shop",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#080810",
+  "theme_color": "#7c3aed",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "img/logo-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "img/logo-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

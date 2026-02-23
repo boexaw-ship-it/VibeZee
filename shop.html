@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shop — VibeZee</title>
+
+  <!-- Manifest -->
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#7c3aed"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="VibeZee"/>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="img/logo-32.png"/>
+  <link rel="icon" type="image/png" sizes="16x16" href="img/logo-16.png"/>
+  <link rel="apple-touch-icon" sizes="192x192" href="img/logo-192.png"/>
+
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/shop.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <div class="cursor"></div>
+  <div class="cursor-trail"></div>
+  <div class="noise"></div>
+
+  <!-- NAV -->
+  <nav class="navbar">
+    <div class="nav-logo">
+      <a href="index.html"><span class="logo-vibe">VIBE</span><span class="logo-zee">ZEE</span></a>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html">HOME</a></li>
+      <li><a href="shop.html" class="active">SHOP</a></li>
+      <li><a href="cart.html">CART <span class="cart-count">0</span></a></li>
+      <li><a href="login.html" class="btn-nav">LOGIN</a></li>
+    </ul>
+    <div class="nav-hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html">HOME</a>
+    <a href="shop.html" class="active">SHOP</a>
+    <a href="cart.html">CART</a>
+    <a href="login.html">LOGIN</a>
+  </div>
+
+  <!-- PAGE HEADER -->
+  <section class="page-header">
+    <div class="hero-bg-grid"></div>
+    <div class="hero-glow glow-purple"></div>
+    <div class="page-header-content">
+      <span class="section-tag">// BROWSE ALL</span>
+      <h1 class="page-title">SHOP</h1>
+      <p>Find your perfect gaming gear. Filter by category, sort by price.</p>
+    </div>
+  </section>
+
+  <!-- SHOP LAYOUT -->
+  <div class="shop-layout">
+
+    <!-- SIDEBAR FILTER -->
+    <aside class="sidebar">
+      <div class="sidebar-block">
+        <h3 class="sidebar-title">CATEGORIES</h3>
+        <ul class="filter-list" id="catFilter">
+          <li><button class="filter-btn active" data-cat="all">All Products <span class="filter-count" id="count-all">0</span></button></li>
+          <li><button class="filter-btn" data-cat="sound-cards">🔊 Sound Cards <span class="filter-count" id="count-sound-cards">0</span></button></li>
+          <li><button class="filter-btn" data-cat="microphones">🎙 Microphones <span class="filter-count" id="count-microphones">0</span></button></li>
+          <li><button class="filter-btn" data-cat="earphones">🎧 Earphones <span class="filter-count" id="count-earphones">0</span></button></li>
+          <li><button class="filter-btn" data-cat="keyboards">⌨️ Keyboards <span class="filter-count" id="count-keyboards">0</span></button></li>
+          <li><button class="filter-btn" data-cat="mouse">🖱 Mouse <span class="filter-count" id="count-mouse">0</span></button></li>
+          <li><button class="filter-btn" data-cat="joysticks">🕹 Joysticks <span class="filter-count" id="count-joysticks">0</span></button></li>
+          <li><button class="filter-btn" data-cat="memory">💾 Memory Sticks <span class="filter-count" id="count-memory">0</span></button></li>
+          <li><button class="filter-btn" data-cat="harddisk">🗄 Hard Disks <span class="filter-count" id="count-harddisk">0</span></button></li>
+          <li><button class="filter-btn" data-cat="usbc">🔌 USB Type-C <span class="filter-count" id="count-usbc">0</span></button></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-block">
+        <h3 class="sidebar-title">PRICE RANGE</h3>
+        <div class="price-range-wrap">
+          <input type="range" id="priceRange" min="0" max="500000" step="1000" value="500000" class="price-slider"/>
+          <div class="price-labels">
+            <span>0 MMK</span>
+            <span id="priceVal">500,000 MMK</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-block">
+        <h3 class="sidebar-title">SORT BY</h3>
+        <ul class="filter-list" id="sortFilter">
+          <li><button class="filter-btn active" data-sort="default">Default</button></li>
+          <li><button class="filter-btn" data-sort="price-asc">Price: Low → High</button></li>
+          <li><button class="filter-btn" data-sort="price-desc">Price: High → Low</button></li>
+          <li><button class="filter-btn" data-sort="name-asc">Name: A → Z</button></li>
+        </ul>
+      </div>
+
+      <button class="btn-reset" onclick="resetFilters()">↺ RESET FILTERS</button>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="shop-main">
+
+      <!-- Search + Result count -->
+      <div class="shop-toolbar">
+        <div class="search-wrap">
+          <span class="search-icon">⌕</span>
+          <input type="text" id="searchInput" placeholder="Search products..." class="search-input"/>
+        </div>
+        <div class="result-info">
+          Showing <span id="resultCount">0</span> products
+        </div>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="products-grid" id="productsGrid">
+        <!-- Rendered by JS -->
+      </div>
+
+      <!-- Empty state -->
+      <div class="empty-state" id="emptyState" style="display:none;">
+        <div class="empty-icon">🔍</div>
+        <h3>No products found</h3>
+        <p>Try adjusting your filters or search term</p>
+        <button class="btn-primary" onclick="resetFilters()">RESET FILTERS</button>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast">✓ Added to cart!</div>
+
+  <!-- Mobile Filter Toggle -->
+  <button class="fab-filter" onclick="toggleSidebar()">⚙ FILTER</button>
+
+  <footer class="footer">
+    <div class="footer-bottom" style="border-top:none; padding-top:0;">
+      <p>© 2025 VibeZee. All rights reserved.</p>
+      <p>Made with ⚡ in Myanmar</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/shop.js"></script>
+</body>
+</html>
