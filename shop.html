@@ -66,8 +66,15 @@
   <!-- SHOP LAYOUT -->
   <div class="shop-layout">
 
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
     <!-- SIDEBAR FILTER -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="shopSidebar">
+      <div class="sidebar-close-bar">
+        <span class="sidebar-close-title">FILTER</span>
+        <button class="sidebar-close-btn" onclick="toggleSidebar()">✕</button>
+      </div>
       <div class="sidebar-block">
         <h3 class="sidebar-title">CATEGORIES</h3>
         <ul class="filter-list" id="catFilter">
