@@ -177,6 +177,8 @@ function initEvents() {
       btn.classList.add('active');
       activeCategory = btn.dataset.cat;
       renderProducts();
+      // Auto close sidebar on mobile after selecting
+      if (window.innerWidth <= 1000) closeSidebar();
     });
   });
 
@@ -234,7 +236,19 @@ function resetFilters() {
 
 // ── SIDEBAR MOBILE TOGGLE ──
 function toggleSidebar() {
-  document.querySelector('.sidebar').classList.toggle('open');
+  const sidebar = document.getElementById('shopSidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  if (sidebar) sidebar.classList.toggle('open');
+  if (overlay) overlay.classList.toggle('show');
+  document.body.classList.toggle('sidebar-open');
+}
+
+function closeSidebar() {
+  const sidebar = document.getElementById('shopSidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  if (sidebar) sidebar.classList.remove('open');
+  if (overlay) overlay.classList.remove('show');
+  document.body.classList.remove('sidebar-open');
 }
 
 // ── RUN ──
