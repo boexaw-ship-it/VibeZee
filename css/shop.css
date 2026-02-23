@@ -310,3 +310,25 @@
 @media (max-width: 400px) {
   .products-grid { grid-template-columns: 1fr; }
 }
+
+/* ── BACK BUTTON ── */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--gray);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.45rem 1rem;
+  margin-bottom: 1.2rem;
+  transition: var(--transition);
+}
+.back-btn:hover {
+  color: var(--white);
+  border-color: var(--purple);
+  background: rgba(124,58,237,0.1);
+}
