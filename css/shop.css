@@ -351,3 +351,55 @@
   border-color: var(--purple);
   background: rgba(124,58,237,0.1);
 }
+
+/* ── SIDEBAR OVERLAY ── */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(3px);
+  z-index: 199;
+}
+.sidebar-overlay.show { display: block; }
+
+/* ── SIDEBAR CLOSE BAR ── */
+.sidebar-close-bar {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0.5rem;
+}
+.sidebar-close-title {
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--cyan);
+}
+.sidebar-close-btn {
+  width: 32px; height: 32px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--gray);
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+.sidebar-close-btn:hover {
+  border-color: #ef4444;
+  color: #f87171;
+}
+
+/* body scroll lock when sidebar open */
+body.sidebar-open { overflow: hidden; }
+
+@media (max-width: 1000px) {
+  .sidebar-close-bar { display: flex; }
+}
