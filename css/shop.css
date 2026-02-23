@@ -332,3 +332,22 @@
   border-color: var(--purple);
   background: rgba(124,58,237,0.1);
 }
+
+/* ── NAV BACK BUTTON ── */
+.nav-back-btn {
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--gray);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.4rem 0.9rem;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+.nav-back-btn:hover {
+  color: var(--white);
+  border-color: var(--purple);
+  background: rgba(124,58,237,0.1);
+}
