@@ -23,12 +23,16 @@
 </head>
 <body>
 
-  <!-- Custom Cursor -->
-  <div class="cursor"></div>
-  <div class="cursor-trail"></div>
-
   <!-- Noise overlay -->
   <div class="noise"></div>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html" class="active">HOME</a>
+    <a href="shop.html">SHOP</a>
+    <a href="cart.html">CART</a>
+    <a href="login.html">LOGIN</a>
+  </div>
 
   <!-- NAV -->
   <nav class="navbar">
@@ -41,7 +45,7 @@
       <li><a href="cart.html">CART <span class="cart-count">0</span></a></li>
       <li><a href="login.html" class="btn-nav">LOGIN</a></li>
     </ul>
-    <div class="nav-hamburger">
+    <div class="nav-hamburger" onclick="toggleMenu()">
       <span></span><span></span><span></span>
     </div>
   </nav>
