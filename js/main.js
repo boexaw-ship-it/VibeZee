@@ -1,18 +1,23 @@
-// Custom Cursor
-const cursor = document.querySelector('.cursor');
-const trail = document.querySelector('.cursor-trail');
-let trailX = 0, trailY = 0;
+// =============================================
+// VIBEZEE — Main JS
+// =============================================
 
-document.addEventListener('mousemove', e => {
-  cursor.style.left = e.clientX + 'px';
-  cursor.style.top = e.clientY + 'px';
-  setTimeout(() => {
-    trail.style.left = e.clientX + 'px';
-    trail.style.top = e.clientY + 'px';
-  }, 80);
+// ── MOBILE MENU ──
+function toggleMenu() {
+  const menu = document.getElementById('mobileMenu');
+  if (menu) menu.classList.toggle('open');
+}
+
+// Close menu when clicking outside
+document.addEventListener('click', function(e) {
+  const menu = document.getElementById('mobileMenu');
+  const hamburger = document.querySelector('.nav-hamburger');
+  if (menu && hamburger && !menu.contains(e.target) && !hamburger.contains(e.target)) {
+    menu.classList.remove('open');
+  }
 });
 
-// Cart
+// ── CART ──
 let cart = JSON.parse(localStorage.getItem('vz_cart') || '[]');
 updateCartCount();
 
@@ -20,21 +25,24 @@ function addToCart(id) {
   cart.push(id);
   localStorage.setItem('vz_cart', JSON.stringify(cart));
   updateCartCount();
-  showToast();
+  showToast('✓ Added to cart!');
 }
 
 function updateCartCount() {
-  const el = document.querySelector('.cart-count');
-  if (el) el.textContent = cart.length;
+  document.querySelectorAll('.cart-count').forEach(el => {
+    el.textContent = cart.length;
+  });
 }
 
-function showToast() {
+function showToast(msg) {
   const toast = document.getElementById('toast');
+  if (!toast) return;
+  toast.textContent = msg;
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 2500);
 }
 
-// Scroll animation
+// ── SCROLL ANIMATION ──
 const observer = new IntersectionObserver(entries => {
   entries.forEach(e => {
     if (e.isIntersecting) {
