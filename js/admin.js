@@ -87,29 +87,10 @@ function adminLogin() {
   btn.textContent = 'VERIFYING...';
   btn.disabled = true;
 
-  setTimeout(async () => {
-    let success = false;
-
-    try {
-      const res = await fetch('/api/auth/admin-login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        localStorage.setItem('vz_admin_token', data.token);
-        success = true;
-      }
-    } catch (e) {
-      // Demo mode fallback
-      if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-        localStorage.setItem('vz_admin_token', 'admin-demo-token');
-        success = true;
-      }
-    }
-
-    if (success) {
+  setTimeout(() => {
+    // Demo mode — works without backend
+    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+      localStorage.setItem('vz_admin_token', 'admin-demo-token');
       document.getElementById('adminGate').style.display = 'none';
       document.getElementById('adminDashboard').style.display = 'grid';
       adminLoggedIn = true;
@@ -119,7 +100,7 @@ function adminLogin() {
       btn.textContent = 'ENTER DASHBOARD →';
       btn.disabled = false;
     }
-  }, 800);
+  }, 600);
 }
 
 function showGateMsg(msg) {

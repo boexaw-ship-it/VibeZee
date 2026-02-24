@@ -60,29 +60,9 @@ async function handleLogin() {
 
   setLoading(btn, true);
 
-  try {
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
-
-    if (res.ok) {
-      const data = await res.json();
-      localStorage.setItem('vz_token', data.token);
-      localStorage.setItem('vz_user', JSON.stringify(data.user));
-      showMessage('✓ Login successful! Redirecting...', 'success');
-      setTimeout(() => window.location.href = 'index.html', 1200);
-    } else {
-      const err = await res.json();
-      showMessage(err.message || 'Invalid email or password.', 'error');
-    }
-  } catch (e) {
-    // Demo mode — backend not connected
-    demoLogin(email);
-  } finally {
-    setLoading(btn, false);
-  }
+  // Demo mode — works without backend
+  demoLogin(email);
+  setLoading(btn, false);
 }
 
 function demoLogin(email) {
@@ -129,27 +109,10 @@ async function handleRegister() {
 
   setLoading(btn, true);
 
-  try {
-    const res = await fetch('/api/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, phone, password }),
-    });
-
-    if (res.ok) {
-      showMessage('✓ Account created! Please login.', 'success');
-      setTimeout(() => switchTab('login'), 1500);
-    } else {
-      const err = await res.json();
-      showMessage(err.message || 'Registration failed. Try again.', 'error');
-    }
-  } catch (e) {
-    // Demo mode
-    showMessage('✓ Account created! Please login.', 'success');
-    setTimeout(() => switchTab('login'), 1500);
-  } finally {
-    setLoading(btn, false);
-  }
+  // Demo mode — works without backend
+  showMessage('✓ Account created! Please login.', 'success');
+  setTimeout(() => switchTab('login'), 1500);
+  setLoading(btn, false);
 }
 
 // ── PASSWORD STRENGTH ──
