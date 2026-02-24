@@ -10,10 +10,10 @@ const connectDB  = require('./config/db');
 const { initBot } = require('./config/telegram');
 
 // ── Routes ──
-const authRoutes    = require('./routes/auth');
-const productRoutes = require('./routes/products');
-const orderRoutes   = require('./routes/orders');
-const adminRoutes   = require('./routes/admin');
+const authRoutes    = require('./routes/route_auth');
+const productRoutes = require('./routes/route_products');
+const orderRoutes   = require('./routes/route_orders');
+const adminRoutes   = require('./routes/route_admin');
 
 const app  = express();
 const PORT = process.env.PORT || 5000;
