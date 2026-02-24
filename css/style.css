@@ -59,8 +59,9 @@ img { max-width: 100%; }
 .mobile-menu {
   display: none;
   flex-direction: column;
-  background: #1e3a5f;
-  border-bottom: 1px solid var(--border);
+  background: #ffffff;
+  border-bottom: 1px solid rgba(37,99,235,0.1);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
   padding: 1rem 2rem;
   gap: 1rem;
   position: fixed;
@@ -72,7 +73,7 @@ img { max-width: 100%; }
   font-family: var(--font-display);
   font-size: 0.75rem;
   letter-spacing: 2px;
-  color: var(--gray);
+  color: #475569;
   padding: 0.6rem 0;
   border-bottom: 1px solid var(--border);
   transition: var(--transition);
@@ -96,9 +97,10 @@ img { max-width: 100%; }
   align-items: center;
   justify-content: space-between;
   padding: 1rem 4rem;
-  background: rgba(8, 8, 16, 0.85);
+  background: rgba(255, 255, 255, 0.97);
   backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid rgba(37, 99, 235, 0.1);
+  box-shadow: 0 1px 20px rgba(0,0,0,0.06);
   transition: var(--transition);
 }
 
@@ -108,7 +110,7 @@ img { max-width: 100%; }
   font-weight: 900;
   letter-spacing: 2px;
 }
-.logo-vibe { color: var(--white); }
+.logo-vibe { color: #0f172a; }
 .logo-zee { color: #2563eb; }
 
 .nav-links {
@@ -121,7 +123,7 @@ img { max-width: 100%; }
   font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 2px;
-  color: var(--gray);
+  color: #475569;
   transition: var(--transition);
   position: relative;
 }
@@ -130,11 +132,11 @@ img { max-width: 100%; }
   position: absolute;
   bottom: -4px; left: 0;
   width: 0; height: 1px;
-  background: var(--cyan);
+  background: #2563eb;
   transition: var(--transition);
 }
 .nav-links a:hover, .nav-links a.active {
-  color: var(--white);
+  color: #0f172a;
 }
 .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
 
@@ -165,7 +167,7 @@ img { max-width: 100%; }
 }
 
 .nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
-.nav-hamburger span { width: 24px; height: 2px; background: var(--white); border-radius: 2px; }
+.nav-hamburger span { width: 24px; height: 2px; background: #0f172a; border-radius: 2px; }
 
 /* ── HERO ── */
 .hero {
