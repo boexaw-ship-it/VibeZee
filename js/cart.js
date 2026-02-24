@@ -1,339 +1,231 @@
 // =============================================
-// VIBEZEE — Cart JS
+// VIBEZEE — Cart JS (Firebase Firestore Orders)
 // =============================================
 
-// ── PRODUCT DATA (same as shop.js) ──
-const ALL_PRODUCTS = [
-  { id: 101, name: 'Creative Sound Blaster X3', cat: 'sound-cards', icon: '🔊', price: 85000 },
-  { id: 102, name: 'ASUS Xonar SE Sound Card', cat: 'sound-cards', icon: '🔊', price: 65000 },
-  { id: 103, name: 'StarTech 7.1 USB Audio Card', cat: 'sound-cards', icon: '🔊', price: 28000 },
-  { id: 201, name: 'HyperX QuadCast USB Mic', cat: 'microphones', icon: '🎙', price: 120000 },
-  { id: 202, name: 'Blue Snowball iCE Condenser', cat: 'microphones', icon: '🎙', price: 55000 },
-  { id: 203, name: 'Fifine K678 USB Microphone', cat: 'microphones', icon: '🎙', price: 32000 },
-  { id: 204, name: 'BOYA BY-PM500 Studio Mic', cat: 'microphones', icon: '🎙', price: 48000 },
-  { id: 301, name: 'JBL Quantum 50 Gaming Earbuds', cat: 'earphones', icon: '🎧', price: 35000 },
-  { id: 302, name: 'Razer Hammerhead V2', cat: 'earphones', icon: '🎧', price: 45000 },
-  { id: 303, name: 'SteelSeries Tusq Earbuds', cat: 'earphones', icon: '🎧', price: 28000 },
-  { id: 304, name: 'Samsung AKG Wired Earphones', cat: 'earphones', icon: '🎧', price: 18000 },
-  { id: 401, name: 'Redragon K552 Mechanical TKL', cat: 'keyboards', icon: '⌨️', price: 55000 },
-  { id: 402, name: 'Havit HV-KB395L RGB Keyboard', cat: 'keyboards', icon: '⌨️', price: 38000 },
-  { id: 403, name: 'MechStrike Pro Full-Size RGB', cat: 'keyboards', icon: '⌨️', price: 85000 },
-  { id: 404, name: 'Tecware Phantom TKL Mech', cat: 'keyboards', icon: '⌨️', price: 65000 },
-  { id: 501, name: 'Logitech G302 Gaming Mouse', cat: 'mouse', icon: '🖱', price: 45000 },
-  { id: 502, name: 'Razer DeathAdder V3', cat: 'mouse', icon: '🖱', price: 95000 },
-  { id: 503, name: 'Redragon M711 Cobra Mouse', cat: 'mouse', icon: '🖱', price: 25000 },
-  { id: 504, name: 'Havit MS1016 RGB Gaming Mouse', cat: 'mouse', icon: '🖱', price: 20000 },
-  { id: 601, name: 'Xbox Wireless Controller', cat: 'joysticks', icon: '🕹', price: 85000 },
-  { id: 602, name: 'PS5 DualSense Controller', cat: 'joysticks', icon: '🕹', price: 115000 },
-  { id: 603, name: 'Logitech F310 Gamepad', cat: 'joysticks', icon: '🕹', price: 38000 },
-  { id: 701, name: 'SanDisk Ultra 64GB USB 3.0', cat: 'memory', icon: '💾', price: 18000 },
-  { id: 702, name: 'Kingston DataTraveler 128GB', cat: 'memory', icon: '💾', price: 28000 },
-  { id: 703, name: 'Samsung BAR Plus 32GB', cat: 'memory', icon: '💾', price: 12000 },
-  { id: 704, name: 'Toshiba TransMemory 256GB', cat: 'memory', icon: '💾', price: 45000 },
-  { id: 801, name: 'Seagate Barracuda 1TB HDD', cat: 'harddisk', icon: '🗄', price: 55000 },
-  { id: 802, name: 'WD Blue 2TB Internal HDD', cat: 'harddisk', icon: '🗄', price: 85000 },
-  { id: 803, name: 'Samsung 870 EVO 500GB SSD', cat: 'harddisk', icon: '🗄', price: 95000 },
-  { id: 804, name: 'Kingston A400 240GB SSD', cat: 'harddisk', icon: '🗄', price: 48000 },
-  { id: 805, name: 'Toshiba Canvio 1TB Portable', cat: 'harddisk', icon: '🗄', price: 68000 },
-  { id: 901, name: 'Anker 100W USB-C Charging Cable', cat: 'usbc', icon: '🔌', price: 18000 },
-  { id: 902, name: 'Baseus 7-in-1 USB-C Hub', cat: 'usbc', icon: '🔌', price: 45000 },
-  { id: 903, name: 'Ugreen USB-C to HDMI Adapter', cat: 'usbc', icon: '🔌', price: 22000 },
-  { id: 904, name: 'Aukey 5-Port USB-C Hub', cat: 'usbc', icon: '🔌', price: 35000 },
-];
-
-const CAT_LABELS = {
-  'sound-cards': 'Sound Cards', 'microphones': 'Microphones', 'earphones': 'Earphones',
-  'keyboards': 'Keyboards', 'mouse': 'Mouse', 'joysticks': 'Joysticks',
-  'memory': 'Memory Sticks', 'harddisk': 'Hard Disks', 'usbc': 'USB Type-C',
-};
+import { db } from './firebase.js';
+import {
+  collection, addDoc, serverTimestamp,
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // ── CART STATE ──
-let cartItems = []; // [{id, qty}]
+let cart = JSON.parse(localStorage.getItem('vz_cart') || '[]');
+let currentStep = 1;
+let selectedPayment = 'cod';
 
-function loadCart() {
-  const raw = localStorage.getItem('vz_cart');
-  if (!raw) return;
-  const ids = JSON.parse(raw); // array of ids (may repeat)
-  const map = {};
-  ids.forEach(id => { map[id] = (map[id] || 0) + 1; });
-  cartItems = Object.entries(map).map(([id, qty]) => ({ id: parseInt(id), qty }));
-}
+const PRODUCTS = {
+  1: { name:'ProSound X1 Gaming Earphones', price:25000, icon:'🎧' },
+  2: { name:'MechStrike TKL Keyboard',       price:85000, icon:'⌨️' },
+  3: { name:'VortexClick Pro Gaming Mouse',  price:45000, icon:'🖱' },
+  4: { name:'ClearVoice USB Condenser Mic',  price:55000, icon:'🎙' },
+};
 
-function saveCart() {
-  const ids = [];
-  cartItems.forEach(item => {
-    for (let i = 0; i < item.qty; i++) ids.push(item.id);
-  });
-  localStorage.setItem('vz_cart', JSON.stringify(ids));
-  updateCartCount();
-}
+function saveCart() { localStorage.setItem('vz_cart', JSON.stringify(cart)); updateCartCount(); }
 
-function getProduct(id) {
-  return ALL_PRODUCTS.find(p => p.id === id);
+function getCartItems() {
+  const counts = {};
+  cart.forEach(id => counts[id] = (counts[id] || 0) + 1);
+  return Object.entries(counts).map(([id, qty]) => ({
+    id: Number(id), qty,
+    ...(PRODUCTS[id] || { name:'Product #'+id, price:0, icon:'📦' }),
+  }));
 }
 
 function getTotal() {
-  return cartItems.reduce((sum, item) => {
-    const p = getProduct(item.id);
-    return sum + (p ? p.price * item.qty : 0);
-  }, 0);
+  return getCartItems().reduce((s, i) => s + i.price * i.qty, 0);
 }
 
-// ── RENDER CART ──
+function getDelivery() { return getTotal() >= 50000 ? 0 : 3000; }
+
+// ── RENDER ──
 function renderCart() {
-  const container = document.getElementById('cartItems');
+  const items = getCartItems();
+  const wrap  = document.getElementById('cartItems');
   const empty = document.getElementById('cartEmpty');
-  const summary = document.getElementById('orderSummary');
-  const itemCount = document.getElementById('itemCount');
+  const count = document.getElementById('cartItemCount');
+  if (!wrap) return;
 
-  if (!container) return;
-
-  const totalItems = cartItems.reduce((s, i) => s + i.qty, 0);
-  if (itemCount) itemCount.textContent = `(${totalItems})`;
-
-  if (cartItems.length === 0) {
-    container.innerHTML = '';
-    if (empty) empty.style.display = 'block';
-    if (summary) summary.style.display = 'none';
+  if (items.length === 0) {
+    wrap.innerHTML = '';
+    if (empty) empty.style.display = 'flex';
     return;
   }
   if (empty) empty.style.display = 'none';
-  if (summary) summary.style.display = 'block';
+  if (count) count.textContent = items.length + ' item' + (items.length > 1 ? 's' : '');
 
-  container.innerHTML = cartItems.map((item, idx) => {
-    const p = getProduct(item.id);
-    if (!p) return '';
-    return `
-      <div class="cart-item" style="animation-delay:${idx * 0.08}s">
-        <div class="cart-item-img">${p.icon}</div>
-        <div class="cart-item-info">
-          <span class="cart-item-cat">${CAT_LABELS[p.cat] || p.cat}</span>
-          <div class="cart-item-name">${p.name}</div>
-          <div class="cart-item-price">${(p.price * item.qty).toLocaleString()} MMK</div>
-        </div>
-        <div class="cart-item-controls">
-          <div class="qty-wrap">
-            <button class="qty-btn" onclick="changeQty(${p.id}, -1)">−</button>
-            <div class="qty-num">${item.qty}</div>
-            <button class="qty-btn" onclick="changeQty(${p.id}, 1)">+</button>
-          </div>
-          <button class="btn-remove" onclick="removeItem(${p.id})">✕ REMOVE</button>
-        </div>
+  wrap.innerHTML = items.map(item => `
+    <div class="cart-item" id="item-${item.id}">
+      <div class="cart-item-img">${item.icon}</div>
+      <div class="cart-item-info">
+        <h3 class="cart-item-name">${item.name}</h3>
+        <div class="cart-item-price">${item.price.toLocaleString()} MMK</div>
       </div>
-    `;
-  }).join('');
+      <div class="cart-item-controls">
+        <button class="qty-btn" onclick="changeQty(${item.id}, -1)">−</button>
+        <span class="qty-num">${item.qty}</span>
+        <button class="qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
+      </div>
+      <button class="remove-btn" onclick="removeItem(${item.id})">✕</button>
+    </div>
+  `).join('');
 
   renderSummary();
 }
 
 function renderSummary() {
-  const total = getTotal();
-  const sub = document.getElementById('subtotal');
-  const tot = document.getElementById('totalPrice');
-  const delivery = document.getElementById('deliveryFee');
-  if (sub) sub.textContent = total.toLocaleString() + ' MMK';
-  if (tot) tot.textContent = total.toLocaleString() + ' MMK';
-  if (delivery) delivery.textContent = total >= 50000 ? 'Free' : '3,000 MMK';
+  const subtotal  = getTotal();
+  const delivery  = getDelivery();
+  const total     = subtotal + delivery;
+  const setText   = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  setText('subtotalAmt',  subtotal.toLocaleString()  + ' MMK');
+  setText('deliveryAmt',  delivery === 0 ? 'FREE' : delivery.toLocaleString() + ' MMK');
+  setText('totalAmt',     total.toLocaleString()     + ' MMK');
+  setText('summaryTotal', total.toLocaleString()     + ' MMK');
 }
 
-// ── CART ACTIONS ──
-function changeQty(id, delta) {
-  const item = cartItems.find(i => i.id === id);
-  if (!item) return;
-  item.qty += delta;
-  if (item.qty <= 0) {
-    cartItems = cartItems.filter(i => i.id !== id);
-  }
-  saveCart();
-  renderCart();
-}
+window.changeQty = function(id, delta) {
+  const idx = cart.lastIndexOf(id);
+  if (delta > 0) { cart.push(id); }
+  else { if (idx > -1) cart.splice(idx, 1); }
+  saveCart(); renderCart();
+};
 
-function removeItem(id) {
-  cartItems = cartItems.filter(i => i.id !== id);
-  saveCart();
-  renderCart();
-  showToast('✕ Item removed');
-}
+window.removeItem = function(id) {
+  cart = cart.filter(i => i !== id);
+  saveCart(); renderCart();
+};
 
-function clearCart() {
-  if (cartItems.length === 0) return;
-  cartItems = [];
-  saveCart();
-  renderCart();
-  showToast('Cart cleared');
-}
+window.clearCart = function() {
+  if (!confirm('Cart ကို အကုန် ဖျက်မှာ သေချာပါသလား?')) return;
+  cart = []; saveCart(); renderCart();
+};
 
-// ── STEP NAVIGATION ──
-function goToCheckout() {
-  if (cartItems.length === 0) return;
+// ── PAYMENT SELECT ──
+window.selectPayment = function(method) {
+  selectedPayment = method;
+  document.querySelectorAll('.payment-card').forEach(c => c.classList.remove('active'));
+  const el = document.querySelector(`[data-payment="${method}"]`);
+  if (el) el.classList.add('active');
+  const info = {
+    cod:     '🚚 Cash on Delivery — အိမ်ရောက်မှ ငွေပေးရမည်',
+    kbzpay:  '📱 KBZPay — 09xxxxxxxxx သို့ လွှဲပါ',
+    wavepay: '💜 WavePay — 09xxxxxxxxx သို့ လွှဲပါ',
+  };
+  const infoEl = document.getElementById('paymentInfo');
+  if (infoEl) { infoEl.textContent = info[method] || ''; infoEl.style.display = 'block'; }
+};
 
-  // Update steps
-  setStep(2);
+// ── STEPS ──
+window.goToCheckout = function() {
+  if (getCartItems().length === 0) { showToast('Cart ထဲ ပစ္စည်း မရှိဘူး'); return; }
+  showStep(2);
+};
 
-  // Render mini order
-  renderMiniOrder();
+window.goBackToCart = function() { showStep(1); };
 
-  // Payment reminder
-  const method = document.querySelector('input[name="payment"]:checked')?.value || 'cod';
-  renderPaymentReminder(method);
-}
-
-function backToCart() {
-  setStep(1);
-}
-
-function setStep(num) {
-  document.getElementById('step-cart').style.display = num === 1 ? 'block' : 'none';
-  document.getElementById('step-checkout').style.display = num === 2 ? 'block' : 'none';
-  document.getElementById('step-confirm').style.display = num === 3 ? 'block' : 'none';
-
-  document.querySelectorAll('.step').forEach((el, i) => {
-    el.classList.remove('active', 'done');
-    if (i + 1 === num) el.classList.add('active');
-    else if (i + 1 < num) el.classList.add('done');
+function showStep(n) {
+  currentStep = n;
+  document.querySelectorAll('.checkout-step').forEach((s, i) => {
+    s.style.display = (i + 1 === n) ? 'block' : 'none';
   });
-
+  document.querySelectorAll('.step-item').forEach((s, i) => {
+    s.classList.toggle('active',    i + 1 === n);
+    s.classList.toggle('completed', i + 1 < n);
+  });
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function renderMiniOrder() {
-  const container = document.getElementById('miniOrderList');
-  const tot2 = document.getElementById('totalPrice2');
-  if (!container) return;
-
-  container.innerHTML = cartItems.map(item => {
-    const p = getProduct(item.id);
-    if (!p) return '';
-    return `
-      <div class="mini-item">
-        <div class="mini-item-icon">${p.icon}</div>
-        <div class="mini-item-name">${p.name}</div>
-        <div class="mini-item-qty">×${item.qty}</div>
-        <div class="mini-item-price">${(p.price * item.qty).toLocaleString()} MMK</div>
-      </div>
-    `;
-  }).join('');
-
-  if (tot2) tot2.textContent = getTotal().toLocaleString() + ' MMK';
-}
-
-function renderPaymentReminder(method) {
-  const el = document.getElementById('paymentReminder');
-  if (!el) return;
-  const msgs = {
-    cod: { title: '🚚 Cash on Delivery', body: 'Order confirm ဖြစ်ပြီးနောက် delivery မှာ ငွေပေးရမည်ဖြစ်ပါသည်။' },
-    kbzpay: { title: '📱 KBZPay Transfer', body: '<strong>09xxxxxxxx</strong> သို့ total amount လွှဲပြောင်းပြီး screenshot ကို Telegram ပေးပို့ပါ။' },
-    wavepay: { title: '💜 WavePay Transfer', body: '<strong>09xxxxxxxx</strong> သို့ total amount လွှဲပြောင်းပြီး screenshot ကို Telegram ပေးပို့ပါ။' },
-  };
-  const m = msgs[method] || msgs.cod;
-  el.innerHTML = `<h4>${m.title}</h4><p>${m.body}</p>`;
-}
-
 // ── PLACE ORDER ──
-function placeOrder() {
-  const name = document.getElementById('fname')?.value.trim();
-  const phone = document.getElementById('fphone')?.value.trim();
-  const address = document.getElementById('faddress')?.value.trim();
-  const city = document.getElementById('fcity')?.value;
+window.placeOrder = async function() {
+  const name    = document.getElementById('checkName')?.value.trim();
+  const phone   = document.getElementById('checkPhone')?.value.trim();
+  const address = document.getElementById('checkAddress')?.value.trim();
+  const city    = document.getElementById('checkCity')?.value;
+  const note    = document.getElementById('checkNote')?.value.trim();
 
   if (!name || !phone || !address || !city) {
-    showToast('⚠ Please fill all required fields');
-    return;
+    showToast('⚠ အချက်အလက်တွေ ပြည့်ပြည့်ဖြည့်ပါ'); return;
   }
 
-  const method = document.querySelector('input[name="payment"]:checked')?.value || 'cod';
-  const orderId = '#VZ-' + Date.now().toString().slice(-6);
-  const total = getTotal();
+  const btn = document.getElementById('btnPlaceOrder');
+  if (btn) { btn.disabled = true; btn.textContent = 'PLACING ORDER...'; }
 
-  // Build order object
-  const order = {
-    id: orderId,
-    name, phone, address, city,
-    payment: method,
-    items: cartItems.map(item => {
-      const p = getProduct(item.id);
-      return { name: p?.name, qty: item.qty, price: p?.price, total: (p?.price || 0) * item.qty };
-    }),
-    total,
-    date: new Date().toLocaleString('en-GB'),
+  const items   = getCartItems();
+  const subtotal = getTotal();
+  const delivery = getDelivery();
+  const total    = subtotal + delivery;
+  const orderId  = '#VZ-' + Date.now().toString().slice(-6);
+  const dateStr  = new Date().toLocaleString('en-GB', { timeZone: 'Asia/Yangon' });
+
+  const orderData = {
+    orderId, name, phone, address, city,
+    note:    note || '',
+    payment: selectedPayment,
+    items:   items.map(i => ({ name: i.name, icon: i.icon, qty: i.qty, price: i.price, total: i.price * i.qty })),
+    subtotal, delivery, total,
+    status:  'pending',
+    createdAt: serverTimestamp(),
+    date: dateStr,
   };
 
-  // Save order locally
-  const orders = JSON.parse(localStorage.getItem('vz_orders') || '[]');
-  orders.push(order);
-  localStorage.setItem('vz_orders', JSON.stringify(orders));
-
-  // Send to backend (Telegram notification)
-  sendOrderToBackend(order);
-
-  // Show confirm
-  showConfirm(order);
-
-  // Clear cart
-  cartItems = [];
-  saveCart();
-}
-
-async function sendOrderToBackend(order) {
   try {
-    await fetch('/api/orders', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(order),
-    });
-  } catch (e) {
-    console.log('Backend not connected yet:', e.message);
+    // Firestore မှာ order သိမ်း
+    await addDoc(collection(db, 'orders'), orderData);
+
+    // localStorage မှာ backup သိမ်း
+    const saved = JSON.parse(localStorage.getItem('vz_orders') || '[]');
+    saved.push({ ...orderData, createdAt: dateStr });
+    localStorage.setItem('vz_orders', JSON.stringify(saved));
+
+    // Cart ရှင်းပစ်
+    cart = []; saveCart();
+
+    // Confirm step ပြ
+    showConfirm({ ...orderData, date: dateStr });
+    showStep(3);
+
+  } catch (err) {
+    console.error('Order error:', err);
+    showToast('⚠ Order တင်ရာမှာ ပြဿနာ ရှိသည်');
+    if (btn) { btn.disabled = false; btn.textContent = 'PLACE ORDER →'; }
   }
-}
+};
 
 function showConfirm(order) {
-  setStep(3);
-
-  const idEl = document.getElementById('confirmOrderId');
-  if (idEl) idEl.textContent = order.id;
-
-  const details = document.getElementById('confirmDetails');
-  if (!details) return;
-
-  const payLabels = { cod: 'Cash on Delivery', kbzpay: 'KBZPay', wavepay: 'WavePay' };
-
-  details.innerHTML = `
-    <div class="confirm-row"><span>Name</span><span>${order.name}</span></div>
-    <div class="confirm-row"><span>Phone</span><span>${order.phone}</span></div>
-    <div class="confirm-row"><span>City</span><span>${order.city}</span></div>
-    <div class="confirm-row"><span>Payment</span><span>${payLabels[order.payment] || order.payment}</span></div>
-    <div class="confirm-row"><span>Items</span><span>${order.items.length} item(s)</span></div>
-    <div class="confirm-row"><span>Total</span><span style="color:var(--cyan)">${order.total.toLocaleString()} MMK</span></div>
-    <div class="confirm-row"><span>Date</span><span>${order.date}</span></div>
+  const payLabels = { cod:'Cash on Delivery', kbzpay:'KBZPay', wavepay:'WavePay' };
+  const el = document.getElementById('confirmDetails');
+  if (!el) return;
+  el.innerHTML = `
+    <div class="confirm-row"><span>Order ID</span><span class="confirm-val">${order.orderId}</span></div>
+    <div class="confirm-row"><span>Name</span><span class="confirm-val">${order.name}</span></div>
+    <div class="confirm-row"><span>Phone</span><span class="confirm-val">${order.phone}</span></div>
+    <div class="confirm-row"><span>City</span><span class="confirm-val">${order.city}</span></div>
+    <div class="confirm-row"><span>Payment</span><span class="confirm-val">${payLabels[order.payment] || order.payment}</span></div>
+    <div class="confirm-row"><span>Total</span><span class="confirm-val" style="color:var(--purple);font-family:var(--font-display);">${order.total.toLocaleString()} MMK</span></div>
+    <div class="confirm-row"><span>Status</span><span class="order-status status-pending">PENDING</span></div>
   `;
+  const msgEl = document.getElementById('confirmMessage');
+  if (msgEl) msgEl.textContent = 'မှာယူမှု အောင်မြင်ပါသည်။ မကြာမီ ဆက်သွယ်ပေးပါမည်။ ကျေးဇူးတင်ပါသည်! 🙏';
 }
 
-// ── TOAST ──
+// ── HELPERS ──
+function updateCartCount() {
+  const c = JSON.parse(localStorage.getItem('vz_cart') || '[]');
+  document.querySelectorAll('.cart-count').forEach(el => el.textContent = c.length);
+}
+
 function showToast(msg) {
-  const t = document.getElementById('toast');
-  if (!t) return;
-  t.textContent = msg || '✓ Done!';
-  t.classList.add('show');
+  const t = document.getElementById('toast'); if (!t) return;
+  t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-// ── MOBILE MENU ──
-function toggleMenu() {
-  document.getElementById('mobileMenu')?.classList.toggle('open');
-}
-
-// ── PAYMENT METHOD CHANGE ──
-function initPaymentListeners() {
-  document.querySelectorAll('input[name="payment"]').forEach(radio => {
-    radio.addEventListener('change', () => {
-      renderPaymentReminder(radio.value);
-    });
-  });
-}
+function toggleMenu() { document.getElementById('mobileMenu')?.classList.toggle('open'); }
+window.toggleMenu = toggleMenu;
 
 // ── INIT ──
 document.addEventListener('DOMContentLoaded', () => {
-  loadCart();
   renderCart();
-  initPaymentListeners();
+  updateCartCount();
+  showStep(1);
+  selectPayment('cod');
 });
