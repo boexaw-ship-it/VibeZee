@@ -514,3 +514,28 @@ select.form-input option { background: var(--bg-2); }
   .step-label { display: none; }
   .step-line { width: 25px; }
 }
+
+/* ── ZONE INFO ── */
+.zone-info {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--purple);
+  background: var(--cyan-dim);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.5rem 0.8rem;
+  font-family: var(--font-body);
+}
+
+/* Optgroup styling */
+select optgroup {
+  font-weight: 700;
+  color: var(--purple);
+  background: var(--bg-card);
+}
+select option {
+  font-weight: 400;
+  padding-left: 1rem;
+  background: var(--bg-card);
+  color: var(--white);
+}
