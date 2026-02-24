@@ -8,7 +8,7 @@
   padding: 8rem 4rem 4rem;
   overflow: hidden;
   border-bottom: 1px solid var(--border);
-  background: var(--bg-2);
+  background: #ffffff;
 }
 .page-header-content {
   position: relative;
@@ -49,14 +49,14 @@
   overflow-y: auto;
 }
 .sidebar::-webkit-scrollbar { width: 4px; }
-.sidebar::-webkit-scrollbar-thumb { background: var(--gray-dim); border-radius: 2px; }
+.sidebar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 2px; }
 
 .sidebar-block { margin-bottom: 2rem; }
 .sidebar-title {
   font-family: var(--font-display);
   font-size: 0.6rem;
   letter-spacing: 3px;
-  color: var(--cyan);
+  color: #2563eb;
   margin-bottom: 1rem;
   padding-bottom: 0.5rem;
   border-bottom: 1px solid var(--border);
@@ -94,7 +94,7 @@
 .filter-count {
   font-family: var(--font-display);
   font-size: 0.6rem;
-  background: var(--gray-dim);
+  background: #e2e8f0;
   color: var(--gray);
   padding: 0.15rem 0.45rem;
   border-radius: 20px;
@@ -112,7 +112,7 @@
   width: 100%;
   -webkit-appearance: none;
   height: 4px;
-  background: var(--gray-dim);
+  background: #e2e8f0;
   border-radius: 2px;
   outline: none;
   cursor: pointer;
@@ -135,7 +135,7 @@
   color: var(--gray);
   font-family: var(--font-display);
 }
-#priceVal { color: var(--cyan); font-size: 0.7rem; }
+#priceVal { color: #2563eb; font-size: 0.7rem; }
 
 .btn-reset {
   width: 100%;
@@ -208,7 +208,7 @@
   color: var(--gray);
   white-space: nowrap;
 }
-.result-info span { color: var(--cyan); }
+.result-info span { color: #2563eb; }
 
 /* Products Grid */
 .products-grid {
@@ -245,7 +245,7 @@
   left: 50%;
   transform: translateX(-50%);
   z-index: 50;
-  background: var(--purple);
+  background: #2563eb;
   color: white;
   border: none;
   border-radius: 30px;
@@ -280,7 +280,7 @@
   padding: 0.5rem 0;
   border-bottom: 1px solid var(--border);
 }
-.mobile-menu a.active { color: var(--cyan); }
+.mobile-menu a.active { color: #2563eb; }
 .mobile-menu.open { display: flex; }
 
 /* Responsive */
@@ -377,7 +377,7 @@
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 3px;
-  color: var(--cyan);
+  color: #2563eb;
 }
 .sidebar-close-btn {
   width: 32px; height: 32px;

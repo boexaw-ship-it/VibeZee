@@ -1,29 +1,29 @@
 /* =============================================
-   VIBEZEE — Dark Gaming Theme CSS
+   VIBEZEE — Light Professional Theme CSS
    ============================================= */
 
 :root {
-  --bg: #080e1f;
-  --bg-2: #0d1526;
-  --bg-card: #111d35;
-  --bg-card-hover: #162240;
+  --bg: #f8fafc;
+  --bg-2: #eff6ff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f0f9ff;
   --purple: #2563eb;
-  --purple-light: #60a5fa;
-  --purple-dark: #1d4ed8;
-  --cyan: #e2e8f0;
-  --cyan-dim: rgba(226, 232, 240, 0.1);
-  --cyan-glow: rgba(96, 165, 250, 0.4);
-  --white: #f8fafc;
-  --gray: #94a3b8;
-  --gray-dim: #1e3a5f;
-  --border: rgba(37, 99, 235, 0.2);
-  --border-cyan: rgba(96, 165, 250, 0.25);
+  --purple-light: #1d4ed8;
+  --purple-dark: #1e40af;
+  --cyan: #0f172a;
+  --cyan-dim: rgba(37, 99, 235, 0.08);
+  --cyan-glow: rgba(37, 99, 235, 0.2);
+  --white: #0f172a;
+  --gray: #64748b;
+  --gray-dim: #e2e8f0;
+  --border: rgba(37, 99, 235, 0.12);
+  --border-cyan: rgba(37, 99, 235, 0.2);
   --font-display: 'Orbitron', sans-serif;
   --font-body: 'Rajdhani', sans-serif;
   --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --radius: 12px;
-  --shadow-purple: 0 4px 30px rgba(37, 99, 235, 0.25);
-  --shadow-cyan: 0 4px 30px rgba(96, 165, 250, 0.15);
+  --shadow-purple: 0 4px 24px rgba(37, 99, 235, 0.15);
+  --shadow-cyan: 0 4px 16px rgba(37, 99, 235, 0.1);
 }
 
 /* ── RESET ── */
@@ -31,14 +31,14 @@
 html { scroll-behavior: smooth; }
 
 body {
-  background: var(--bg);
+  background: #f8fafc;
   color: var(--white);
   font-family: var(--font-body);
   font-size: 16px;
   line-height: 1.6;
   overflow-x: hidden;
-  cursor: none;
 }
+
 
 a { text-decoration: none; color: inherit; }
 ul { list-style: none; }
@@ -50,7 +50,7 @@ img { max-width: 100%; }
   inset: 0;
   pointer-events: none;
   z-index: 999;
-  opacity: 0.03;
+  opacity: 0.015;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
 }
 
@@ -59,7 +59,7 @@ img { max-width: 100%; }
 .mobile-menu {
   display: none;
   flex-direction: column;
-  background: var(--bg-2);
+  background: #1e3a5f;
   border-bottom: 1px solid var(--border);
   padding: 1rem 2rem;
   gap: 1rem;
@@ -79,7 +79,7 @@ img { max-width: 100%; }
 }
 .mobile-menu a:last-child { border-bottom: none; }
 .mobile-menu a.active,
-.mobile-menu a:hover { color: var(--cyan); }
+.mobile-menu a:hover { color: var(--purple); }
 .mobile-menu.open { display: flex; }
 
 /* ── SCROLLBAR ── */
@@ -109,7 +109,7 @@ img { max-width: 100%; }
   letter-spacing: 2px;
 }
 .logo-vibe { color: var(--white); }
-.logo-zee { color: var(--purple-light); text-shadow: 0 0 15px rgba(96,165,250,0.5); }
+.logo-zee { color: #2563eb; }
 
 .nav-links {
   display: flex;
@@ -241,8 +241,7 @@ img { max-width: 100%; }
 .hero-title em {
   font-style: normal;
   color: transparent;
-  -webkit-text-stroke: 2px var(--purple-light);
-  text-shadow: 0 4px 20px rgba(37,99,235,0.3);
+  color: #0f172a;
 }
 
 .hero-sub {
@@ -385,7 +384,7 @@ img { max-width: 100%; }
 
 /* ── MARQUEE ── */
 .marquee-wrap {
-  background: #1d4ed8;
+  background: #2563eb;
   padding: 0.8rem 0;
   overflow: hidden;
   border-top: 1px solid var(--purple-dark);
@@ -787,3 +786,15 @@ img { max-width: 100%; }
   .footer-bottom { flex-direction: column; gap: 0.5rem; text-align: center; }
   .hero-title .line-1, .hero-title .line-2 { font-size: 2.5rem; }
 }
+
+/* ── FOOTER LIGHT THEME FIX ── */
+.footer { color: #94a3b8; }
+.footer-logo .logo-vibe { color: #f8fafc; }
+.footer-logo .logo-zee  { color: #60a5fa; }
+.footer-brand p { color: #64748b; }
+.footer-links h4 { color: #f8fafc; }
+.footer-links a  { color: #64748b; }
+.footer-links a:hover { color: #60a5fa; }
+.footer-bottom p { color: #475569; }
+.social-link { color: #64748b !important; }
+.social-link:hover { color: #60a5fa !important; }

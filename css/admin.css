@@ -20,7 +20,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg);
+  background: #f8fafc;
 }
 .gate-bg-grid {
   position: absolute;
@@ -34,7 +34,7 @@
 .gate-glow {
   position: absolute;
   width: 600px; height: 600px;
-  background: rgba(37,99,235,0.1);
+  background: rgba(37,99,235,0.06);
   border-radius: 50%;
   filter: blur(120px);
   top: 50%; left: 50%;
@@ -46,7 +46,7 @@
   z-index: 1;
   width: 100%;
   max-width: 400px;
-  background: rgba(17,17,34,0.9);
+  background: rgba(255,255,255,0.97);
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 2.5rem;
@@ -128,7 +128,7 @@
 
 /* ── SIDEBAR ── */
 .admin-sidebar {
-  background: var(--bg-2);
+  background: #ffffff;
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
@@ -269,7 +269,7 @@
   padding: 0 2rem;
   height: 60px;
   border-bottom: 1px solid var(--border);
-  background: rgba(8,8,16,0.9);
+  background: rgba(248,250,252,0.95);
   backdrop-filter: blur(10px);
   flex-shrink: 0;
 }
