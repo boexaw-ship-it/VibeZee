@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VibeZee — Tech & Gaming Peripherals</title>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#0d1f2d"/>
+  <link rel="icon" type="image/png" sizes="32x32" href="img/logo-32.png"/>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html" class="active">HOME</a>
+    <a href="shop.html">SHOP</a>
+    <a href="cart.html">CART</a>
+    <a href="login.html" id="mobileAuthLink">LOGIN</a>
+  </div>
+
+  <!-- NAV -->
+  <nav class="navbar">
+    <div class="nav-logo" onclick="location.href='index.html'">
+      <span class="logo-vibe">VIBE</span><span class="logo-zee">ZEE</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html" class="active">HOME</a></li>
+      <li><a href="shop.html">SHOP</a></li>
+      <li><a href="cart.html">CART <span class="cart-badge cart-count">0</span></a></li>
+      <li><a href="login.html" class="btn-nav" id="navAuthLink">LOGIN</a></li>
+    </ul>
+    <div class="nav-hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-content">
+      <div class="hero-badge">⚡ NEW ARRIVALS 2025</div>
+      <h1 class="hero-title">
+        <span class="line-1">LEVEL UP</span>
+        <span class="line-2">YOUR <em>SETUP</em></span>
+      </h1>
+      <p class="hero-sub">Premium gaming peripherals & accessories. Sound cards, mechanical keyboards, pro mice & more — built for winners.</p>
+      <div class="hero-cta">
+        <a href="shop.html" class="btn-primary">SHOP NOW →</a>
+        <a href="#categories" class="btn-ghost">EXPLORE</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-num">500+</span>
+          <span class="stat-label">Products</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-num">10K+</span>
+          <span class="stat-label">Customers</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-num">4.9★</span>
+          <span class="stat-label">Rating</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-ring ring-1"></div>
+      <div class="hero-ring ring-2"></div>
+      <div class="hero-ring ring-3"></div>
+      <div class="hero-icon">🎧</div>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee-wrap">
+    <div class="marquee-track">
+      <span>SOUND CARDS</span><span class="dot">✦</span>
+      <span>MICROPHONES</span><span class="dot">✦</span>
+      <span>EARPHONES</span><span class="dot">✦</span>
+      <span>KEYBOARDS</span><span class="dot">✦</span>
+      <span>GAMING MOUSE</span><span class="dot">✦</span>
+      <span>JOYSTICKS</span><span class="dot">✦</span>
+      <span>MEMORY STICKS</span><span class="dot">✦</span>
+      <span>HARD DISKS</span><span class="dot">✦</span>
+      <span>USB TYPE-C</span><span class="dot">✦</span>
+      <span>SOUND CARDS</span><span class="dot">✦</span>
+      <span>MICROPHONES</span><span class="dot">✦</span>
+      <span>EARPHONES</span><span class="dot">✦</span>
+      <span>KEYBOARDS</span><span class="dot">✦</span>
+      <span>GAMING MOUSE</span><span class="dot">✦</span>
+      <span>JOYSTICKS</span><span class="dot">✦</span>
+      <span>MEMORY STICKS</span><span class="dot">✦</span>
+      <span>HARD DISKS</span><span class="dot">✦</span>
+      <span>USB TYPE-C</span><span class="dot">✦</span>
+    </div>
+  </div>
+
+  <!-- CATEGORIES -->
+  <section class="categories" id="categories">
+    <div class="section-header">
+      <span class="section-tag">// BROWSE BY</span>
+      <h2 class="section-title">CATEGORIES</h2>
+    </div>
+    <div class="cat-grid">
+      <a href="shop.html?cat=sound-cards" class="cat-card cat-lg">
+        <div class="cat-icon">🔊</div>
+        <div class="cat-info"><h3>Sound Cards</h3><p>Studio & gaming audio</p></div>
+        <div class="cat-arrow">→</div>
+      </a>
+      <a href="shop.html?cat=microphones" class="cat-card">
+        <div class="cat-icon">🎙</div>
+        <div class="cat-info"><h3>Microphones</h3><p>Crystal clear voice</p></div>
+        <div class="cat-arrow">→</div>
+      </a>
+      <a href="shop.html?cat=earphones" class="cat-card">
+        <div class="cat-icon">🎧</div>
+        <div class="cat-info"><h3>Earphones</h3><p>Immersive sound</p></div>
+        <div class="cat-arrow">→</div>
+      </a>
+      <a href="shop.html?cat=keyboards" class="cat-card cat-lg">
+        <div class="cat-icon">⌨️</div>
+        <div class="cat-info"><h3>Keyboards</h3><p>Mechanical & membrane</p></div>
+        <div class="cat-arrow">→</div>
+      </a>
+      <a href="shop.html?cat=mouse" class="cat-card">
+        <div class="cat-icon">🖱</div>
+        <div class="cat-info"><h3>Gaming Mouse</h3><p>Precision control</p></div>
+        <div class="cat-arrow">→</div>
+      </a>
+      <a href="shop.html?cat=joysticks" class="cat-card">
+        <div class="cat-icon">🕹</div>
+        <div class="cat-info"><h3>Joysticks</h3><p>Console controllers</p></div>
+        <div class="cat-arrow">→</div>
+      </a>
+      <a href="shop.html?cat=memory" class="cat-card">
+        <div class="cat-icon">💾</div>
+        <div class="cat-info"><h3>Memory Sticks</h3><p>Fast USB drives</p></div>
+        <div class="cat-arrow">→</div>
+      </a>
+      <a href="shop.html?cat=harddisk" class="cat-card">
+        <div class="cat-icon">🗄</div>
+        <div class="cat-info"><h3>Hard Disks</h3><p>HDD & SSD storage</p></div>
+        <div class="cat-arrow">→</div>
+      </a>
+      <a href="shop.html?cat=usbc" class="cat-card cat-lg">
+        <div class="cat-icon">🔌</div>
+        <div class="cat-info"><h3>USB Type-C</h3><p>Cables, hubs & adapters</p></div>
+        <div class="cat-arrow">→</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- FEATURED -->
+  <section class="featured">
+    <div class="section-header">
+      <span class="section-tag">// HOT PICKS</span>
+      <h2 class="section-title">FEATURED</h2>
+    </div>
+    <div class="products-grid">
+      <div class="product-card">
+        <div class="product-badge">HOT</div>
+        <div class="product-img-wrap"><div class="product-img-placeholder">🔊</div></div>
+        <div class="product-info">
+          <span class="product-cat">Sound Cards</span>
+          <h3 class="product-name">Creative Sound Blaster X3</h3>
+          <div class="product-rating">★★★★★ <span>(48)</span></div>
+          <div class="product-price-row">
+            <span class="product-price">85,000 MMK</span>
+            <button class="btn-cart" onclick="addToCart(101)">+ CART</button>
+          </div>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-badge">HOT</div>
+        <div class="product-img-wrap"><div class="product-img-placeholder">🎙</div></div>
+        <div class="product-info">
+          <span class="product-cat">Microphones</span>
+          <h3 class="product-name">HyperX QuadCast USB Mic</h3>
+          <div class="product-rating">★★★★★ <span>(91)</span></div>
+          <div class="product-price-row">
+            <span class="product-price">120,000 MMK</span>
+            <button class="btn-cart" onclick="addToCart(201)">+ CART</button>
+          </div>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-badge">HOT</div>
+        <div class="product-img-wrap"><div class="product-img-placeholder">🖱</div></div>
+        <div class="product-info">
+          <span class="product-cat">Gaming Mouse</span>
+          <h3 class="product-name">Razer DeathAdder V3</h3>
+          <div class="product-rating">★★★★★ <span>(318)</span></div>
+          <div class="product-price-row">
+            <span class="product-price">95,000 MMK</span>
+            <button class="btn-cart" onclick="addToCart(502)">+ CART</button>
+          </div>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-badge">HOT</div>
+        <div class="product-img-wrap"><div class="product-img-placeholder">⌨️</div></div>
+        <div class="product-info">
+          <span class="product-cat">Keyboards</span>
+          <h3 class="product-name">Redragon K552 Mechanical TKL</h3>
+          <div class="product-rating">★★★★★ <span>(186)</span></div>
+          <div class="product-price-row">
+            <span class="product-price">55,000 MMK</span>
+            <button class="btn-cart" onclick="addToCart(401)">+ CART</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="text-center" style="margin-top:3rem;">
+      <a href="shop.html" class="btn-primary">VIEW ALL PRODUCTS →</a>
+    </div>
+  </section>
+
+  <!-- WHY US -->
+  <section class="why-us">
+    <div class="section-header">
+      <span class="section-tag">// WHY VIBEZEE</span>
+      <h2 class="section-title">YOUR ADVANTAGE</h2>
+    </div>
+    <div class="why-grid">
+      <div class="why-card">
+        <div class="why-icon">⚡</div>
+        <h3>Fast Delivery</h3>
+        <p>Same-day dispatch in Yangon. Nationwide shipping within 3–5 days.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">🛡</div>
+        <h3>Genuine Products</h3>
+        <p>100% authentic products. We don't carry fakes — ever.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">💳</div>
+        <h3>Easy Payment</h3>
+        <p>KBZPay, WavePay, or Cash on Delivery — your choice.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">🔁</div>
+        <h3>7-Day Returns</h3>
+        <p>Not satisfied? Return within 7 days. No questions asked.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="logo-vibe">VIBE</span><span class="logo-zee">ZEE</span>
+        </div>
+        <p>Your ultimate destination for gaming peripherals & PC accessories in Myanmar.</p>
+        <div class="footer-socials">
+          <a href="#" class="social-link">📘 Facebook</a>
+          <a href="#" class="social-link">📱 Telegram</a>
+        </div>
+      </div>
+      <div class="footer-links">
+        <h4>SHOP</h4>
+        <ul>
+          <li><a href="shop.html?cat=sound-cards">Sound Cards</a></li>
+          <li><a href="shop.html?cat=microphones">Microphones</a></li>
+          <li><a href="shop.html?cat=keyboards">Keyboards</a></li>
+          <li><a href="shop.html?cat=mouse">Mouse</a></li>
+          <li><a href="shop.html?cat=joysticks">Joysticks</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h4>ACCOUNT</h4>
+        <ul>
+          <li><a href="login.html">Login</a></li>
+          <li><a href="login.html#register">Register</a></li>
+          <li><a href="cart.html">My Cart</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h4>SUPPORT</h4>
+        <ul>
+          <li><a href="#">Contact Us</a></li>
+          <li><a href="#">Return Policy</a></li>
+          <li><a href="#">FAQ</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 VibeZee. All rights reserved.</p>
+      <p>Made with ⚡ in Myanmar</p>
+    </div>
+  </footer>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

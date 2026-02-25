@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cart — VibeZee</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/cart.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html">HOME</a>
+    <a href="shop.html">SHOP</a>
+    <a href="cart.html" class="active">CART</a>
+    <a href="login.html" id="mobileAuthLink">LOGIN</a>
+  </div>
+
+  <!-- NAV -->
+  <nav class="navbar">
+    <div class="nav-logo" onclick="location.href='index.html'">
+      <span class="logo-vibe">VIBE</span><span class="logo-zee">ZEE</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html">HOME</a></li>
+      <li><a href="shop.html">SHOP</a></li>
+      <li><a href="cart.html" class="active">CART <span class="cart-badge cart-count">0</span></a></li>
+      <li><a href="login.html" class="btn-nav" id="navAuthLink">LOGIN</a></li>
+    </ul>
+    <div class="nav-hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+
+  <!-- CART HEADER -->
+  <div class="cart-header">
+    <div class="cart-header-content">
+      <div class="cart-header-left">
+        <span class="cart-tag">// MY CART</span>
+        <h1 class="cart-title">CART</h1>
+      </div>
+      <button class="btn-clear" onclick="clearCart()">✕ CLEAR ALL</button>
+    </div>
+  </div>
+
+  <!-- STEPS -->
+  <div class="steps-wrap">
+    <div class="steps">
+      <div class="step-item active">
+        <div class="step-num">01</div>
+        <span class="step-label">CART</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-item">
+        <div class="step-num">02</div>
+        <span class="step-label">CHECKOUT</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-item">
+        <div class="step-num">03</div>
+        <span class="step-label">CONFIRM</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="cart-main">
+
+    <!-- STEP 1: CART -->
+    <div class="checkout-step active">
+
+      <!-- Empty state -->
+      <div class="cart-empty" id="cartEmpty">
+        <div class="empty-icon">🛒</div>
+        <h2 class="empty-title">CART IS EMPTY</h2>
+        <p class="empty-sub">Add some products first!</p>
+        <a href="shop.html" class="btn-primary">SHOP NOW →</a>
+      </div>
+
+      <!-- Cart items -->
+      <div class="cart-items" id="cartItems"></div>
+
+      <!-- Summary -->
+      <div class="cart-summary">
+        <div class="summary-title">SUMMARY</div>
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <span id="subtotalAmt">0 MMK</span>
+        </div>
+        <div class="summary-row">
+          <span>Delivery</span>
+          <span id="deliveryAmt">—</span>
+        </div>
+        <div class="summary-row total">
+          <span>TOTAL</span>
+          <span id="totalAmt">0 MMK</span>
+        </div>
+      </div>
+
+      <!-- Payment -->
+      <div class="payment-title">PAYMENT METHOD</div>
+      <div class="payment-options">
+        <div class="payment-card active" data-payment="cod" onclick="selectPayment('cod')">
+          <div class="payment-icon">🚚</div>
+          <div class="payment-info">
+            <div class="payment-name">Cash on Delivery</div>
+            <div class="payment-detail">Pay when you receive</div>
+          </div>
+          <div class="payment-check">✓</div>
+        </div>
+        <div class="payment-card" data-payment="kbzpay" onclick="selectPayment('kbzpay')">
+          <div class="payment-icon">📱</div>
+          <div class="payment-info">
+            <div class="payment-name">KBZPay</div>
+            <div class="payment-detail">09xxxxxxxx</div>
+          </div>
+          <div class="payment-check">✓</div>
+        </div>
+        <div class="payment-card" data-payment="wavepay" onclick="selectPayment('wavepay')">
+          <div class="payment-icon">💜</div>
+          <div class="payment-info">
+            <div class="payment-name">WavePay</div>
+            <div class="payment-detail">09xxxxxxxx</div>
+          </div>
+          <div class="payment-check">✓</div>
+        </div>
+      </div>
+
+      <button class="btn-proceed" onclick="goToCheckout()">PROCEED TO CHECKOUT →</button>
+      <a href="shop.html" class="btn-continue">← CONTINUE SHOPPING</a>
+    </div>
+
+    <!-- STEP 2: CHECKOUT -->
+    <div class="checkout-step">
+      <button class="btn-back" onclick="goBackToCart()">← BACK TO CART</button>
+
+      <!-- Mini summary -->
+      <div class="checkout-summary">
+        <div class="checkout-summary-row">
+          <span>Subtotal</span><span id="summarySubtotal">0 MMK</span>
+        </div>
+        <div class="checkout-summary-row">
+          <span>Delivery</span><span id="summaryDelivery">—</span>
+        </div>
+        <div class="checkout-summary-row total-row">
+          <span>TOTAL</span><span id="summaryTotal">0 MMK</span>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <div class="checkout-form-title">DELIVERY INFO</div>
+
+      <div class="form-group">
+        <label class="form-label">FULL NAME *</label>
+        <input type="text" class="form-input" id="checkName" placeholder="Ko Mg Mg"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">PHONE NUMBER *</label>
+        <input type="tel" class="form-input" id="checkPhone" placeholder="09xxxxxxxxx"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">TOWNSHIP *</label>
+        <select class="form-select" id="checkTownship"></select>
+        <div class="zone-info" id="zoneInfo"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">ADDRESS *</label>
+        <input type="text" class="form-input" id="checkAddress" placeholder="Street, Ward, City"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">NOTE (optional)</label>
+        <textarea class="form-textarea" id="checkNote" placeholder="Special instructions..."></textarea>
+      </div>
+
+      <button class="btn-proceed" id="btnPlaceOrder" onclick="placeOrder()">PLACE ORDER →</button>
+    </div>
+
+    <!-- STEP 3: CONFIRM -->
+    <div class="checkout-step">
+      <div class="confirm-wrap">
+        <div class="confirm-icon">✅</div>
+        <h2 class="confirm-title">ORDER PLACED!</h2>
+        <p class="confirm-msg" id="confirmMsg"></p>
+        <div class="confirm-details" id="confirmDetails"></div>
+        <a href="shop.html" class="btn-primary">CONTINUE SHOPPING →</a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Firebase CDN -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script>
+    firebase.initializeApp({
+      apiKey:            "AIzaSyBNeNP79jp1mr894citf2V5RHN4UQCCWaU",
+      authDomain:        "vibezee-845ba.firebaseapp.com",
+      projectId:         "vibezee-845ba",
+      storageBucket:     "vibezee-845ba.firebasestorage.app",
+      messagingSenderId: "456545528983",
+      appId:             "1:456545528983:web:8ace5d1c6a49acf68fcdd2"
+    });
+  </script>
+  <script src="js/main.js"></script>
+  <script src="js/cart.js"></script>
+</body>
+</html>

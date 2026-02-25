@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shop — VibeZee</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/shop.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html">HOME</a>
+    <a href="shop.html" class="active">SHOP</a>
+    <a href="cart.html">CART</a>
+    <a href="login.html" id="mobileAuthLink">LOGIN</a>
+  </div>
+
+  <!-- NAV -->
+  <nav class="navbar">
+    <div class="nav-logo" onclick="location.href='index.html'">
+      <span class="logo-vibe">VIBE</span><span class="logo-zee">ZEE</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html">HOME</a></li>
+      <li><a href="shop.html" class="active">SHOP</a></li>
+      <li><a href="cart.html">CART <span class="cart-badge cart-count">0</span></a></li>
+      <li><a href="login.html" class="btn-nav" id="navAuthLink">LOGIN</a></li>
+    </ul>
+    <div class="nav-hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+
+  <!-- SHOP HEADER -->
+  <div class="shop-header">
+    <div class="shop-header-content">
+      <span class="shop-tag">// BROWSE ALL</span>
+      <h1 class="shop-title">SHOP</h1>
+      <p class="shop-sub">Find your perfect gaming gear. Filter by category, sort by price.</p>
+    </div>
+  </div>
+
+  <!-- SEARCH -->
+  <div style="background:var(--bg);padding:2rem 2rem 0;">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" class="search-input" id="searchInput" placeholder="Search products..."/>
+    </div>
+  </div>
+
+  <!-- SHOP LAYOUT -->
+  <div class="shop-layout">
+
+    <!-- Filter Toggle (mobile) -->
+    <button class="filter-toggle-btn" onclick="toggleSidebar()">⚙ FILTER</button>
+
+    <!-- SIDEBAR -->
+    <aside class="shop-sidebar" id="shopSidebar">
+      <div class="sidebar-title">FILTERS</div>
+
+      <div class="filter-group">
+        <span class="filter-group-label">CATEGORY</span>
+        <button class="filter-btn active" data-cat="all">All Products</button>
+        <button class="filter-btn" data-cat="sound-cards">🔊 Sound Cards</button>
+        <button class="filter-btn" data-cat="microphones">🎙 Microphones</button>
+        <button class="filter-btn" data-cat="earphones">🎧 Earphones</button>
+        <button class="filter-btn" data-cat="keyboards">⌨️ Keyboards</button>
+        <button class="filter-btn" data-cat="mouse">🖱 Mouse</button>
+        <button class="filter-btn" data-cat="joysticks">🕹 Joysticks</button>
+        <button class="filter-btn" data-cat="memory">💾 Memory Sticks</button>
+        <button class="filter-btn" data-cat="harddisk">🗄 Hard Disks</button>
+        <button class="filter-btn" data-cat="usbc">🔌 USB Type-C</button>
+      </div>
+
+      <div class="filter-group">
+        <span class="filter-group-label">MAX PRICE</span>
+        <div class="price-range-wrap">
+          <input type="range" class="price-range" id="priceRange" min="5000" max="500000" step="5000" value="500000"/>
+          <div class="price-val" id="priceVal">500,000 MMK</div>
+        </div>
+      </div>
+
+      <button class="btn-reset" onclick="resetFilters()">✕ RESET FILTERS</button>
+    </aside>
+
+    <!-- PRODUCTS -->
+    <div class="products-area">
+      <div class="products-meta">
+        <div class="products-count">Showing <strong id="productCount">0</strong> products</div>
+        <div class="sort-btns">
+          <button class="sort-btn active" data-sort="default">DEFAULT</button>
+          <button class="sort-btn" data-sort="price-asc">PRICE ↑</button>
+          <button class="sort-btn" data-sort="price-desc">PRICE ↓</button>
+          <button class="sort-btn" data-sort="rating">TOP RATED</button>
+        </div>
+      </div>
+      <div class="shop-products-grid" id="productsGrid"></div>
+    </div>
+
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <script src="js/main.js"></script>
+  <script src="js/shop.js"></script>
+</body>
+</html>
