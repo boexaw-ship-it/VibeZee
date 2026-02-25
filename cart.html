@@ -255,7 +255,20 @@
     </div>
   </footer>
 
-  <script src="js/main.js" defer></script>
-<script type="module" src="js/cart.js"></script>
+  <!-- Firebase CDN -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script>
+    firebase.initializeApp({
+      apiKey:            "AIzaSyBNeNP79jp1mr894citf2V5RHN4UQCCWaU",
+      authDomain:        "vibezee-845ba.firebaseapp.com",
+      projectId:         "vibezee-845ba",
+      storageBucket:     "vibezee-845ba.firebasestorage.app",
+      messagingSenderId: "456545528983",
+      appId:             "1:456545528983:web:8ace5d1c6a49acf68fcdd2"
+    });
+  </script>
+  <script src="js/main.js"></script>
+  <script src="js/cart.js"></script>
 </body>
 </html>
