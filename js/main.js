@@ -23,14 +23,15 @@ updateCartCount();
 
 function addToCart(id) {
   // Login စစ်တယ်
-  const user = localStorage.getItem('vz_user');
-  if (!user) {
+  const userStr = localStorage.getItem('vz_user');
+  if (!userStr) {
     showToast('⚠ Login ဝင်မှ cart ထည့်နိုင်သည်');
-    setTimeout(() => window.location.href = 'login.html', 1500);
+    setTimeout(() => { window.location.href = 'login.html'; }, 1500);
     return;
   }
 
-  cart.push(Number(id));
+  const numId = Number(id);
+  cart.push(numId);
   localStorage.setItem('vz_cart', JSON.stringify(cart));
   updateCartCount();
   showToast('✓ Added to cart!');
@@ -61,12 +62,12 @@ function updateNavAuth() {
   if (user) {
     // Login ဝင်ထားရင် — name ပြပြီး logout button ပြ
     loginLinks.forEach(el => {
-      el.textContent = user.name?.split(' ')[0] || 'PROFILE';
+      el.textContent = (user.name || 'PROFILE').toUpperCase();
       el.href = '#';
       el.onclick = (e) => { e.preventDefault(); showLogoutMenu(); };
     });
     mobileLoginLinks.forEach(el => {
-      el.textContent = user.name?.split(' ')[0] || 'PROFILE';
+      el.textContent = (user.name || 'PROFILE').toUpperCase();
     });
   }
 }

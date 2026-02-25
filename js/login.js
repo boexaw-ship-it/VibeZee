@@ -49,7 +49,7 @@ async function handleLogin() {
   try {
     const userCred = await signInWithEmailAndPassword(auth, email, password);
     const user = userCred.user;
-    localStorage.setItem('vz_user', JSON.stringify({ uid: user.uid, name: user.displayName || 'User', email: user.email, role: 'customer' }));
+    localStorage.setItem('vz_user', JSON.stringify({ uid: user.uid, name: name || user.displayName || 'User', email: user.email, role: 'customer' }));
     showMessage('✓ Login successful! Redirecting...', 'success');
     setTimeout(() => window.location.href = 'index.html', 1200);
   } catch (err) {
