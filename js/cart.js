@@ -1,8 +1,8 @@
 // =============================================
-// VIBEZEE — Cart JS (No Module, Firebase CDN)
+// VIBEZEE — Cart JS (Fixed & Final)
 // =============================================
 
-// ── TELEGRAM CONFIG ──
+// ── TELEGRAM CONFIG ── (ဒီမှာ သင့် Bot Token နဲ့ Chat ID ထည့်ပါ)
 const TELEGRAM_BOT_TOKEN = 'YOUR_BOT_TOKEN_HERE';
 const TELEGRAM_CHAT_ID   = 'YOUR_GROUP_ID_HERE';
 
@@ -47,46 +47,22 @@ const PRODUCTS = {
 
 // ── DELIVERY ZONES ──
 const DELIVERY_ZONES = {
-  zone1: {
-    label: 'Zone 1 — Downtown Yangon',
-    fee: 3000,
-    townships: ['Pabedan','Kyauktada','Lanmadaw','Latha','Botahtaung','Mingala Taungnyunt','Seikkan'],
-  },
-  zone2: {
-    label: 'Zone 2 — Inner Yangon',
-    fee: 4000,
-    townships: ['Kamaryut','Sanchaung','Bahan','Tamwe','Thingangyun','Yankin','Pazundaung','Dawbon'],
-  },
-  zone3: {
-    label: 'Zone 3 — Mid Yangon',
-    fee: 5000,
-    townships: ['North Okkalapa','South Okkalapa','Thaketa','Dagon','North Dagon','South Dagon','East Dagon','Dagon Seikkan','Ahlon','Insein'],
-  },
-  zone4: {
-    label: 'Zone 4 — Outer Yangon',
-    fee: 6000,
-    townships: ['Hlaingthaya','Shwepyithar','Mingaladon','Hlegu','Hmawbi','Htantabin','Dala','Seikgyikanaungto'],
-  },
-  zone5: {
-    label: 'Zone 5 — Greater Yangon',
-    fee: 8000,
-    townships: ['Thanlyin','Kyauktan','Kawhmu','Kayan','Twantay','Cocokyun','Kungyangon'],
-  },
-  zone6: {
-    label: 'Zone 6 — Outside Yangon',
-    fee: 10000,
-    townships: ['Mandalay','Naypyidaw','Bago','Mawlamyine','Pathein','Monywa','Meiktila','Taunggyi','Pyay','Myeik','Dawei','Kalay','Loikaw','Hakha','Sittwe','Myitkyina','တခြားမြို့နယ်များ'],
-  },
+  zone1: { label: 'Zone 1 — Downtown Yangon', fee: 3000, townships: ['Pabedan','Kyauktada','Lanmadaw','Latha','Botahtaung','Mingala Taungnyunt','Seikkan'] },
+  zone2: { label: 'Zone 2 — Inner Yangon', fee: 4000, townships: ['Kamaryut','Sanchaung','Bahan','Tamwe','Thingangyun','Yankin','Pazundaung','Dawbon'] },
+  zone3: { label: 'Zone 3 — Mid Yangon', fee: 5000, townships: ['North Okkalapa','South Okkalapa','Thaketa','Dagon','North Dagon','South Dagon','East Dagon','Dagon Seikkan','Ahlon','Insein'] },
+  zone4: { label: 'Zone 4 — Outer Yangon', fee: 6000, townships: ['Hlaingthaya','Shwepyithar','Mingaladon','Hlegu','Hmawbi','Htantabin','Dala','Seikgyikanaungto'] },
+  zone5: { label: 'Zone 5 — Greater Yangon', fee: 8000, townships: ['Thanlyin','Kyauktan','Kawhmu','Kayan','Twantay','Cocokyun','Kungyangon'] },
+  zone6: { label: 'Zone 6 — Outside Yangon', fee: 10000, townships: ['Mandalay','Naypyidaw','Bago','Mawlamyine','Pathein','Monywa','Meiktila','Taunggyi','Pyay','Myeik','Dawei','Kalay','Loikaw','Hakha','Sittwe','Myitkyina','တခြားမြို့နယ်များ'] },
 };
 
-// Township → Zone map
 const TOWNSHIP_ZONE = {};
 Object.entries(DELIVERY_ZONES).forEach(([key, z]) => {
   z.townships.forEach(t => { TOWNSHIP_ZONE[t] = key; });
 });
 
 // ── STATE ──
-cart = JSON.parse(localStorage.getItem('vz_cart') || '[]').map(Number);
+// အရေးကြီးသည်: cart ကို let နဲ့ ကြေညာရပါမယ်
+let cart = JSON.parse(localStorage.getItem('vz_cart') || '[]').map(Number);
 let currentStep     = 1;
 let selectedPayment = 'cod';
 let selectedTownship = '';
@@ -121,16 +97,16 @@ function renderCart() {
   if (items.length === 0) {
     wrap.innerHTML = '';
     if (empty) empty.style.display = 'flex';
-    if (count) count.textContent = '0 items';
+    if (count) count.textContent = '(0)';
     renderSummary();
     return;
   }
 
   if (empty) empty.style.display = 'none';
-  if (count) count.textContent = items.length + ' item' + (items.length > 1 ? 's' : '');
+  if (count) count.textContent = `(${items.length})`;
 
   wrap.innerHTML = items.map(item => `
-    <div class="cart-item" id="item-${item.id}">
+    <div class="cart-item">
       <div class="cart-item-img">${item.icon}</div>
       <div class="cart-item-info">
         <h3 class="cart-item-name">${item.name}</h3>
@@ -152,8 +128,9 @@ function renderSummary() {
   const subtotal = getSubtotal();
   const total    = subtotal + deliveryFee;
   const s = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  
   s('subtotalAmt',  subtotal.toLocaleString() + ' MMK');
-  s('deliveryAmt',  deliveryFee === 0 ? (selectedTownship ? 'FREE' : 'မြို့နယ် ရွေးပါ') : deliveryFee.toLocaleString() + ' MMK');
+  s('deliveryAmt',  selectedTownship ? deliveryFee.toLocaleString() + ' MMK' : 'မြို့နယ် ရွေးပါ');
   s('totalAmt',     total.toLocaleString() + ' MMK');
   s('summaryTotal', total.toLocaleString() + ' MMK');
 }
@@ -206,6 +183,8 @@ function buildTownshipDropdown() {
     if (zoneInfo && zoneKey) {
       zoneInfo.textContent = '📍 ' + DELIVERY_ZONES[zoneKey].label + ' — ' + deliveryFee.toLocaleString() + ' MMK';
       zoneInfo.style.display = 'block';
+    } else if (zoneInfo) {
+      zoneInfo.style.display = 'none';
     }
   });
 }
@@ -214,13 +193,13 @@ function buildTownshipDropdown() {
 function selectPayment(method) {
   selectedPayment = method;
   document.querySelectorAll('.payment-card').forEach(c => c.classList.remove('active'));
-  const el = document.querySelector('[data-payment="' + method + '"]');
+  const el = document.querySelector(`[data-payment="${method}"]`);
   if (el) el.classList.add('active');
 }
 
 // ── STEPS ──
 function goToCheckout() {
-  if (getCartItems().length === 0) { showToast('⚠ Cart ထဲ ပစ္စည်း မရှိဘူး'); return; }
+  if (cart.length === 0) { showToast('⚠ Cart ထဲ ပစ္စည်း မရှိဘူး'); return; }
   showStep(2);
 }
 
@@ -231,9 +210,14 @@ function showStep(n) {
   document.querySelectorAll('.checkout-step').forEach((s, i) => {
     s.style.display = (i + 1 === n) ? 'block' : 'none';
   });
-  document.querySelectorAll('.step-item').forEach((s, i) => {
-    s.classList.toggle('active',    i + 1 === n);
-    s.classList.toggle('completed', i + 1 < n);
+  // Indicators
+  const indicators = ['step-1-indicator', 'step-2-indicator', 'step-3-indicator'];
+  indicators.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.classList.toggle('active', i + 1 === n);
+      el.classList.toggle('completed', i + 1 < n);
+    }
   });
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -254,9 +238,9 @@ async function placeOrder() {
   const items    = getCartItems();
   const subtotal = getSubtotal();
   const total    = subtotal + deliveryFee;
-  const orderId  = '#VZ-' + Date.now().toString().slice(-6);
+  const orderId  = '#VZ-' + Math.floor(100000 + Math.random() * 900000);
   const zoneKey  = TOWNSHIP_ZONE[selectedTownship];
-  const date     = new Date().toLocaleString('en-GB', { timeZone: 'Asia/Yangon' });
+  const date     = new Date().toLocaleString();
 
   const orderData = {
     orderId, name, phone, address,
@@ -271,31 +255,19 @@ async function placeOrder() {
   };
 
   try {
-    // Firebase Firestore သိမ်း
     const db = firebase.firestore();
     await db.collection('orders').add({
       ...orderData,
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
     });
 
-    // localStorage backup
-    const saved = JSON.parse(localStorage.getItem('vz_orders') || '[]');
-    saved.push(orderData);
-    localStorage.setItem('vz_orders', JSON.stringify(saved));
-
-    // Telegram notify
     sendTelegramNotification(orderData);
-
     cart = []; saveCart();
     showConfirm(orderData);
     showStep(3);
-
   } catch (err) {
     console.error('Order error:', err);
-    // Firebase မအလုပ်လုပ်ရင် localStorage ပဲ သိမ်း
-    const saved = JSON.parse(localStorage.getItem('vz_orders') || '[]');
-    saved.push(orderData);
-    localStorage.setItem('vz_orders', JSON.stringify(saved));
+    // Fallback: Telegram only if Firebase fails
     sendTelegramNotification(orderData);
     cart = []; saveCart();
     showConfirm(orderData);
@@ -307,10 +279,11 @@ async function placeOrder() {
 async function sendTelegramNotification(order) {
   if (TELEGRAM_BOT_TOKEN === 'YOUR_BOT_TOKEN_HERE') return;
   const payLabels = { cod:'Cash on Delivery 🚚', kbzpay:'KBZPay 📱', wavepay:'WavePay 💜' };
-  const itemsList = order.items.map(i => '  • ' + i.icon + ' ' + i.name + ' x' + i.qty + ' — ' + (i.price * i.qty).toLocaleString() + ' MMK').join('\n');
-  const msg = '🛒 *NEW ORDER — VibeZee*\n━━━━━━━━━━━━━━━━━━━\n📦 Order ID: ' + order.orderId + '\n📅 ' + order.date + '\n\n👤 *Customer*\n• ' + order.name + '\n• ' + order.phone + '\n• ' + order.address + '\n• ' + order.township + ' (' + order.zone + ')\n\n🛍 *Items*\n' + itemsList + '\n\n💰 *Payment*\n• Subtotal: ' + order.subtotal.toLocaleString() + ' MMK\n• Delivery: ' + order.deliveryFee.toLocaleString() + ' MMK\n• *Total: ' + order.total.toLocaleString() + ' MMK*\n• ' + (payLabels[order.payment] || order.payment) + (order.note ? '\n\n📝 ' + order.note : '') + '\n━━━━━━━━━━━━━━━━━━━\n✅ PENDING';
+  const itemsList = order.items.map(i => ` • ${i.icon} ${i.name} x${i.qty}`).join('\n');
+  const msg = `🛒 *NEW ORDER — VibeZee*\n━━━━━━━━━━━━━━━━━━━\n📦 Order ID: ${order.orderId}\n\n👤 *Customer*\n• ${order.name}\n• ${order.phone}\n• ${order.address}\n• ${order.township}\n\n🛍 *Items*\n${itemsList}\n\n💰 *Total: ${order.total.toLocaleString()} MMK*\n• Method: ${payLabels[order.payment] || order.payment}\n━━━━━━━━━━━━━━━━━━━`;
+  
   try {
-    await fetch('https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage', {
+    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: msg, parse_mode: 'Markdown' }),
@@ -324,19 +297,12 @@ function showConfirm(order) {
   const el = document.getElementById('confirmDetails');
   if (!el) return;
   el.innerHTML = `
-    <div class="confirm-row"><span>Order ID</span><span class="confirm-val">${order.orderId}</span></div>
-    <div class="confirm-row"><span>Name</span><span class="confirm-val">${order.name}</span></div>
-    <div class="confirm-row"><span>Phone</span><span class="confirm-val">${order.phone}</span></div>
-    <div class="confirm-row"><span>Township</span><span class="confirm-val">${order.township}</span></div>
-    <div class="confirm-row"><span>Zone</span><span class="confirm-val">${order.zone}</span></div>
-    <div class="confirm-row"><span>Payment</span><span class="confirm-val">${payLabels[order.payment]||order.payment}</span></div>
-    <div class="confirm-row"><span>Subtotal</span><span class="confirm-val">${order.subtotal.toLocaleString()} MMK</span></div>
-    <div class="confirm-row"><span>Delivery</span><span class="confirm-val">${order.deliveryFee.toLocaleString()} MMK</span></div>
-    <div class="confirm-row"><span>Total</span><span class="confirm-val" style="color:#2563eb;font-weight:700;">${order.total.toLocaleString()} MMK</span></div>
-    <div class="confirm-row"><span>Status</span><span class="order-status status-pending">PENDING</span></div>
+    <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Order ID:</span><strong>${order.orderId}</strong></div>
+    <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Total:</span><strong>${order.total.toLocaleString()} MMK</strong></div>
+    <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Payment:</span><strong>${payLabels[order.payment]||order.payment}</strong></div>
+    <hr style="margin:10px 0; border:0; border-top:1px solid #eee;">
+    <p style="font-size:0.9rem; color:#666;">ပို့ဆောင်မည့်လိပ်စာ: ${order.address}, ${order.township}</p>
   `;
-  const msgEl = document.getElementById('confirmMessage');
-  if (msgEl) msgEl.textContent = 'မှာယူမှု အောင်မြင်ပါသည်။ မကြာမီ ဆက်သွယ်ပေးပါမည်။ ကျေးဇူးတင်ပါသည်! 🙏';
 }
 
 // ── HELPERS ──
@@ -359,16 +325,8 @@ function toggleMenu() {
 
 // ── INIT ──
 document.addEventListener('DOMContentLoaded', function() {
-  // Login စစ်တယ်
-  const user = localStorage.getItem('vz_user');
-  if (!user) {
-    window.location.href = 'login.html';
-    return;
-  }
-
   renderCart();
   updateCartCount();
   buildTownshipDropdown();
   showStep(1);
-  selectPayment('cod');
 });
