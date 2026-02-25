@@ -9,8 +9,8 @@ import {
 
 // ── TELEGRAM CONFIG ──
 // ⚠️ ဒီနေရာမှာ ကိုယ့် Token နဲ့ Group ID ထည့်ပါ
-const TELEGRAM_BOT_TOKEN = 'YOUR_BOT_TOKEN_HERE';   // ← Line 11: BotFather က ရတဲ့ token
-const TELEGRAM_CHAT_ID   = 'YOUR_GROUP_ID_HERE';    // ← Line 12: Group ID (- နဲ့ စတတ်တယ်)
+const TELEGRAM_BOT_TOKEN = '8271893873:AAFW2t-Nr7qoKRoxVo9daYQCG5hBE6rscSs';   // ← Line 11: BotFather က ရတဲ့ token
+const TELEGRAM_CHAT_ID   = '-1003844393952';    // ← Line 12: Group ID (- နဲ့ စတတ်တယ်)
 
 // ── PRODUCTS (shop.js နဲ့ sync) ──
 const PRODUCTS = {
