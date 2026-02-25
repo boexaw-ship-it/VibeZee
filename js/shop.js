@@ -2,6 +2,38 @@
 // VIBEZEE — Shop JS (Products + Filter + Search)
 // =============================================
 
+// ── ADD TO CART (self-contained) ──
+function addToCart(id) {
+  const userStr = localStorage.getItem('vz_user');
+  if (!userStr) {
+    // Toast ပြပြီး login ပို့
+    const toast = document.getElementById('toast');
+    if (toast) {
+      toast.textContent = '⚠ Login ဝင်မှ cart ထည့်နိုင်သည်';
+      toast.classList.add('show');
+      setTimeout(() => { toast.classList.remove('show'); window.location.href = 'login.html'; }, 1500);
+    } else {
+      window.location.href = 'login.html';
+    }
+    return;
+  }
+
+  const cart = JSON.parse(localStorage.getItem('vz_cart') || '[]');
+  cart.push(Number(id));
+  localStorage.setItem('vz_cart', JSON.stringify(cart));
+
+  // Cart count update
+  document.querySelectorAll('.cart-count').forEach(el => el.textContent = cart.length);
+
+  // Toast ပြ
+  const toast = document.getElementById('toast');
+  if (toast) {
+    toast.textContent = '✓ Added to cart!';
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+}
+
 // ── PRODUCT DATA ──
 const PRODUCTS = [
   // Sound Cards
