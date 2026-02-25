@@ -86,7 +86,7 @@ Object.entries(DELIVERY_ZONES).forEach(([key, z]) => {
 });
 
 // ── STATE ──
-let cart            = JSON.parse(localStorage.getItem('vz_cart') || '[]').map(Number);
+cart = JSON.parse(localStorage.getItem('vz_cart') || '[]').map(Number);
 let currentStep     = 1;
 let selectedPayment = 'cod';
 let selectedTownship = '';
