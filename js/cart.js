@@ -357,6 +357,17 @@ function toggleMenu() {
   document.getElementById('mobileMenu')?.classList.toggle('open');
 }
 
+// ── EXPOSE FUNCTIONS ──
+window.renderCart       = renderCart;
+window.changeQty        = changeQty;
+window.removeItem       = removeItem;
+window.clearCart        = clearCart;
+window.goToCheckout     = goToCheckout;
+window.goBackToCart     = goBackToCart;
+window.placeOrder       = placeOrder;
+window.selectPayment    = selectPayment;
+window.toggleMenu       = toggleMenu;
+
 // ── INIT ──
 document.addEventListener('DOMContentLoaded', function() {
   // Login စစ်တယ်
