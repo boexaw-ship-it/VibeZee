@@ -1,18 +1,12 @@
 // =============================================
-// VIBEZEE — Cart JS (Firebase + Delivery Zones)
+// VIBEZEE — Cart JS (No Module, Firebase CDN)
 // =============================================
 
-import { db } from './firebase.js';
-import {
-  collection, addDoc, serverTimestamp,
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
 // ── TELEGRAM CONFIG ──
-// ⚠️ ဒီနေရာမှာ ကိုယ့် Token နဲ့ Group ID ထည့်ပါ
-const TELEGRAM_BOT_TOKEN = '8271893873:AAFW2t-Nr7qoKRoxVo9daYQCG5hBE6rscSs';   // ← Line 11: BotFather က ရတဲ့ token
-const TELEGRAM_CHAT_ID   = '-1003844393952';    // ← Line 12: Group ID (- နဲ့ စတတ်တယ်)
+const TELEGRAM_BOT_TOKEN = 'YOUR_BOT_TOKEN_HERE';
+const TELEGRAM_CHAT_ID   = 'YOUR_GROUP_ID_HERE';
 
-// ── PRODUCTS (shop.js နဲ့ sync) ──
+// ── PRODUCTS ──
 const PRODUCTS = {
   101: { name:'Creative Sound Blaster X3',       price:85000,  icon:'🔊' },
   102: { name:'ASUS Xonar SE Sound Card',         price:65000,  icon:'🔊' },
@@ -56,87 +50,64 @@ const DELIVERY_ZONES = {
   zone1: {
     label: 'Zone 1 — Downtown Yangon',
     fee: 3000,
-    townships: [
-      'Pabedan', 'Kyauktada', 'Lanmadaw', 'Latha',
-      'Botahtaung', 'Mingala Taungnyunt', 'Seikkan',
-    ],
+    townships: ['Pabedan','Kyauktada','Lanmadaw','Latha','Botahtaung','Mingala Taungnyunt','Seikkan'],
   },
   zone2: {
     label: 'Zone 2 — Inner Yangon',
     fee: 4000,
-    townships: [
-      'Kamaryut', 'Sanchaung', 'Bahan', 'Tamwe',
-      'Thingangyun', 'Yankin', 'Pazundaung', 'Dawbon',
-    ],
+    townships: ['Kamaryut','Sanchaung','Bahan','Tamwe','Thingangyun','Yankin','Pazundaung','Dawbon'],
   },
   zone3: {
     label: 'Zone 3 — Mid Yangon',
     fee: 5000,
-    townships: [
-      'North Okkalapa', 'South Okkalapa', 'Thaketa',
-      'Dagon', 'North Dagon', 'South Dagon', 'East Dagon',
-      'Dagon Seikkan', 'Ahlon', 'Insein',
-    ],
+    townships: ['North Okkalapa','South Okkalapa','Thaketa','Dagon','North Dagon','South Dagon','East Dagon','Dagon Seikkan','Ahlon','Insein'],
   },
   zone4: {
     label: 'Zone 4 — Outer Yangon',
     fee: 6000,
-    townships: [
-      'Hlaingthaya', 'Shwepyithar', 'Mingaladon',
-      'Hlegu', 'Hmawbi', 'Htantabin',
-      'North Dagon Industrial', 'Dala', 'Seikgyikanaungto',
-    ],
+    townships: ['Hlaingthaya','Shwepyithar','Mingaladon','Hlegu','Hmawbi','Htantabin','Dala','Seikgyikanaungto'],
   },
   zone5: {
-    label: 'Zone 5 — Greater Yangon & Suburbs',
+    label: 'Zone 5 — Greater Yangon',
     fee: 8000,
-    townships: [
-      'Thanlyin', 'Kyauktan', 'Kawhmu', 'Kayan',
-      'Twantay', 'Cocokyun', 'Kungyangon',
-    ],
+    townships: ['Thanlyin','Kyauktan','Kawhmu','Kayan','Twantay','Cocokyun','Kungyangon'],
   },
   zone6: {
-    label: 'Zone 6 — Outside Yangon (တစ်ပြည်လုံး)',
+    label: 'Zone 6 — Outside Yangon',
     fee: 10000,
-    townships: [
-      'Mandalay', 'Naypyidaw', 'Bago', 'Mawlamyine',
-      'Pathein', 'Monywa', 'Meiktila', 'Taunggyi',
-      'Pyay', 'Myeik', 'Dawei', 'Kalay',
-      'Loikaw', 'Hakha', 'Sittwe', 'Myitkyina',
-      'တခြားမြို့နယ်များ',
-    ],
+    townships: ['Mandalay','Naypyidaw','Bago','Mawlamyine','Pathein','Monywa','Meiktila','Taunggyi','Pyay','Myeik','Dawei','Kalay','Loikaw','Hakha','Sittwe','Myitkyina','တခြားမြို့နယ်များ'],
   },
 };
 
-// ── BUILD TOWNSHIP → ZONE MAP ──
+// Township → Zone map
 const TOWNSHIP_ZONE = {};
-Object.entries(DELIVERY_ZONES).forEach(([zoneKey, zoneData]) => {
-  zoneData.townships.forEach(t => { TOWNSHIP_ZONE[t] = zoneKey; });
+Object.entries(DELIVERY_ZONES).forEach(([key, z]) => {
+  z.townships.forEach(t => { TOWNSHIP_ZONE[t] = key; });
 });
 
-// ── CART STATE ──
-let cart = JSON.parse(localStorage.getItem('vz_cart') || '[]').map(Number);
-let currentStep    = 1;
+// ── STATE ──
+let cart            = JSON.parse(localStorage.getItem('vz_cart') || '[]').map(Number);
+let currentStep     = 1;
 let selectedPayment = 'cod';
 let selectedTownship = '';
-let deliveryFee    = 0;
+let deliveryFee     = 0;
 
-function saveCart() { localStorage.setItem('vz_cart', JSON.stringify(cart)); updateCartCount(); }
+function saveCart() {
+  localStorage.setItem('vz_cart', JSON.stringify(cart));
+  updateCartCount();
+}
 
 function getCartItems() {
   const counts = {};
   cart.forEach(id => counts[id] = (counts[id] || 0) + 1);
   return Object.entries(counts).map(([id, qty]) => ({
     id: Number(id), qty,
-    ...(PRODUCTS[id] || { name: 'Product #' + id, price: 0, icon: '📦' }),
+    ...(PRODUCTS[id] || { name:'Product #'+id, price:0, icon:'📦' }),
   }));
 }
 
-function getSubtotal() { return getCartItems().reduce((s, i) => s + i.price * i.qty, 0); }
-
-function calcDeliveryFee(township) {
-  const zoneKey = TOWNSHIP_ZONE[township];
-  return zoneKey ? DELIVERY_ZONES[zoneKey].fee : 0;
+function getSubtotal() {
+  return getCartItems().reduce((s, i) => s + i.price * i.qty, 0);
 }
 
 // ── RENDER CART ──
@@ -150,8 +121,11 @@ function renderCart() {
   if (items.length === 0) {
     wrap.innerHTML = '';
     if (empty) empty.style.display = 'flex';
+    if (count) count.textContent = '0 items';
+    renderSummary();
     return;
   }
+
   if (empty) empty.style.display = 'none';
   if (count) count.textContent = items.length + ' item' + (items.length > 1 ? 's' : '');
 
@@ -177,29 +151,32 @@ function renderCart() {
 function renderSummary() {
   const subtotal = getSubtotal();
   const total    = subtotal + deliveryFee;
-  const setText  = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-  setText('subtotalAmt',  subtotal.toLocaleString()   + ' MMK');
-  setText('deliveryAmt',  deliveryFee === 0 ? 'မြို့နယ် ရွေးပါ' : deliveryFee.toLocaleString() + ' MMK');
-  setText('totalAmt',     total.toLocaleString()      + ' MMK');
-  setText('summaryTotal', total.toLocaleString()      + ' MMK');
+  const s = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  s('subtotalAmt',  subtotal.toLocaleString() + ' MMK');
+  s('deliveryAmt',  deliveryFee === 0 ? (selectedTownship ? 'FREE' : 'မြို့နယ် ရွေးပါ') : deliveryFee.toLocaleString() + ' MMK');
+  s('totalAmt',     total.toLocaleString() + ' MMK');
+  s('summaryTotal', total.toLocaleString() + ' MMK');
 }
 
-window.changeQty = function(id, delta) {
-  const idx = cart.lastIndexOf(id);
-  if (delta > 0) { cart.push(id); }
-  else { if (idx > -1) cart.splice(idx, 1); }
+function changeQty(id, delta) {
+  if (delta > 0) {
+    cart.push(id);
+  } else {
+    const idx = cart.lastIndexOf(id);
+    if (idx > -1) cart.splice(idx, 1);
+  }
   saveCart(); renderCart();
-};
+}
 
-window.removeItem = function(id) {
+function removeItem(id) {
   cart = cart.filter(i => i !== id);
   saveCart(); renderCart();
-};
+}
 
-window.clearCart = function() {
+function clearCart() {
   if (!confirm('Cart ကို အကုန် ဖျက်မှာ သေချာပါသလား?')) return;
   cart = []; saveCart(); renderCart();
-};
+}
 
 // ── TOWNSHIP DROPDOWN ──
 function buildTownshipDropdown() {
@@ -207,58 +184,47 @@ function buildTownshipDropdown() {
   if (!select) return;
 
   select.innerHTML = '<option value="">-- မြို့နယ် ရွေးပါ --</option>';
-
-  Object.entries(DELIVERY_ZONES).forEach(([zoneKey, zoneData]) => {
+  Object.entries(DELIVERY_ZONES).forEach(([key, z]) => {
     const group = document.createElement('optgroup');
-    group.label = `${zoneData.label} — ${zoneData.fee.toLocaleString()} MMK`;
-    zoneData.townships.forEach(t => {
-      const opt   = document.createElement('option');
-      opt.value   = t;
+    group.label = z.label + ' — ' + z.fee.toLocaleString() + ' MMK';
+    z.townships.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t;
       opt.textContent = t;
       group.appendChild(opt);
     });
     select.appendChild(group);
   });
 
-  select.addEventListener('change', () => {
-    selectedTownship = select.value;
-    deliveryFee      = calcDeliveryFee(selectedTownship);
+  select.addEventListener('change', function() {
+    selectedTownship = this.value;
+    const zoneKey = TOWNSHIP_ZONE[selectedTownship];
+    deliveryFee = zoneKey ? DELIVERY_ZONES[zoneKey].fee : 0;
     renderSummary();
 
-    // Zone label ပြ
-    const zoneKey  = TOWNSHIP_ZONE[selectedTownship];
     const zoneInfo = document.getElementById('zoneInfo');
     if (zoneInfo && zoneKey) {
-      const z = DELIVERY_ZONES[zoneKey];
-      zoneInfo.textContent = `📍 ${z.label} — Delivery: ${z.fee.toLocaleString()} MMK`;
+      zoneInfo.textContent = '📍 ' + DELIVERY_ZONES[zoneKey].label + ' — ' + deliveryFee.toLocaleString() + ' MMK';
       zoneInfo.style.display = 'block';
-    } else if (zoneInfo) {
-      zoneInfo.style.display = 'none';
     }
   });
 }
 
 // ── PAYMENT ──
-window.selectPayment = function(method) {
+function selectPayment(method) {
   selectedPayment = method;
   document.querySelectorAll('.payment-card').forEach(c => c.classList.remove('active'));
-  const el = document.querySelector(`[data-payment="${method}"]`);
+  const el = document.querySelector('[data-payment="' + method + '"]');
   if (el) el.classList.add('active');
-  const info = {
-    cod:     '🚚 Cash on Delivery — အိမ်ရောက်မှ ငွေပေးရမည်',
-    kbzpay:  '📱 KBZPay — 09xxxxxxxxx သို့ လွှဲပါ',
-    wavepay: '💜 WavePay — 09xxxxxxxxx သို့ လွှဲပါ',
-  };
-  const infoEl = document.getElementById('paymentInfo');
-  if (infoEl) { infoEl.textContent = info[method] || ''; infoEl.style.display = 'block'; }
-};
+}
 
 // ── STEPS ──
-window.goToCheckout = function() {
-  if (getCartItems().length === 0) { showToast('Cart ထဲ ပစ္စည်း မရှိဘူး'); return; }
+function goToCheckout() {
+  if (getCartItems().length === 0) { showToast('⚠ Cart ထဲ ပစ္စည်း မရှိဘူး'); return; }
   showStep(2);
-};
-window.goBackToCart = function() { showStep(1); };
+}
+
+function goBackToCart() { showStep(1); }
 
 function showStep(n) {
   currentStep = n;
@@ -273,18 +239,14 @@ function showStep(n) {
 }
 
 // ── PLACE ORDER ──
-window.placeOrder = async function() {
-  const name     = document.getElementById('checkName')?.value.trim();
-  const phone    = document.getElementById('checkPhone')?.value.trim();
-  const address  = document.getElementById('checkAddress')?.value.trim();
-  const note     = document.getElementById('checkNote')?.value.trim();
+async function placeOrder() {
+  const name    = document.getElementById('checkName')?.value.trim();
+  const phone   = document.getElementById('checkPhone')?.value.trim();
+  const address = document.getElementById('checkAddress')?.value.trim();
+  const note    = document.getElementById('checkNote')?.value.trim();
 
-  if (!name || !phone || !address) {
-    showToast('⚠ နာမည်၊ ဖုန်းနံပါတ်၊ လိပ်စာ ဖြည့်ပါ'); return;
-  }
-  if (!selectedTownship) {
-    showToast('⚠ မြို့နယ် ရွေးပါ'); return;
-  }
+  if (!name || !phone || !address) { showToast('⚠ နာမည်၊ ဖုန်းနံပါတ်၊ လိပ်စာ ဖြည့်ပါ'); return; }
+  if (!selectedTownship)           { showToast('⚠ မြို့နယ် ရွေးပါ'); return; }
 
   const btn = document.getElementById('btnPlaceOrder');
   if (btn) { btn.disabled = true; btn.textContent = 'PLACING ORDER...'; }
@@ -294,96 +256,69 @@ window.placeOrder = async function() {
   const total    = subtotal + deliveryFee;
   const orderId  = '#VZ-' + Date.now().toString().slice(-6);
   const zoneKey  = TOWNSHIP_ZONE[selectedTownship];
-  const zoneLabel = zoneKey ? DELIVERY_ZONES[zoneKey].label : '';
+  const date     = new Date().toLocaleString('en-GB', { timeZone: 'Asia/Yangon' });
 
   const orderData = {
-    orderId,
-    name, phone, address,
+    orderId, name, phone, address,
     township:    selectedTownship,
-    zone:        zoneLabel,
+    zone:        zoneKey ? DELIVERY_ZONES[zoneKey].label : '',
     note:        note || '',
     payment:     selectedPayment,
-    items:       items.map(i => ({ name: i.name, icon: i.icon, qty: i.qty, price: i.price, total: i.price * i.qty })),
-    subtotal,
-    deliveryFee,
-    total,
+    items:       items.map(i => ({ name:i.name, icon:i.icon, qty:i.qty, price:i.price, total:i.price*i.qty })),
+    subtotal, deliveryFee, total,
     status:      'pending',
-    createdAt:   serverTimestamp(),
-    date:        new Date().toLocaleString('en-GB', { timeZone: 'Asia/Yangon' }),
+    date,
   };
 
   try {
-    await addDoc(collection(db, 'orders'), orderData);
+    // Firebase Firestore သိမ်း
+    const db = firebase.firestore();
+    await db.collection('orders').add({
+      ...orderData,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
 
+    // localStorage backup
     const saved = JSON.parse(localStorage.getItem('vz_orders') || '[]');
-    saved.push({ ...orderData, createdAt: orderData.date });
+    saved.push(orderData);
     localStorage.setItem('vz_orders', JSON.stringify(saved));
 
+    // Telegram notify
+    sendTelegramNotification(orderData);
+
     cart = []; saveCart();
-    sendTelegramNotification(orderData); // Telegram notify
     showConfirm(orderData);
     showStep(3);
 
   } catch (err) {
     console.error('Order error:', err);
-    showToast('⚠ Order တင်ရာမှာ ပြဿနာ ရှိသည်');
-    if (btn) { btn.disabled = false; btn.textContent = 'PLACE ORDER →'; }
-  }
-};
-
-// ── TELEGRAM NOTIFICATION ──
-async function sendTelegramNotification(order) {
-  if (TELEGRAM_BOT_TOKEN === 'YOUR_BOT_TOKEN_HERE') return; // token မထည့်ရသေး
-
-  const payLabels = { cod: 'Cash on Delivery 🚚', kbzpay: 'KBZPay 📱', wavepay: 'WavePay 💜' };
-
-  const itemsList = order.items
-    .map(i => `  • ${i.icon} ${i.name} x${i.qty} — ${(i.price * i.qty).toLocaleString()} MMK`)
-    .join('
-');
-
-  const msg = `
-🛒 *NEW ORDER — VibeZee*
-━━━━━━━━━━━━━━━━━━━
-📦 Order ID: \`${order.orderId}\`
-📅 Date: ${order.date}
-
-👤 *Customer Info*
-• Name: ${order.name}
-• Phone: ${order.phone}
-• Address: ${order.address}
-• Township: ${order.township}
-• Zone: ${order.zone}
-
-🛍 *Items*
-${itemsList}
-
-💰 *Payment*
-• Subtotal: ${order.subtotal.toLocaleString()} MMK
-• Delivery: ${order.deliveryFee.toLocaleString()} MMK
-• *Total: ${order.total.toLocaleString()} MMK*
-• Method: ${payLabels[order.payment] || order.payment}
-
-${order.note ? '📝 Note: ' + order.note : ''}
-━━━━━━━━━━━━━━━━━━━
-✅ Status: PENDING
-  `.trim();
-
-  try {
-    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id:    TELEGRAM_CHAT_ID,
-        text:       msg,
-        parse_mode: 'Markdown',
-      }),
-    });
-  } catch (err) {
-    console.warn('Telegram notification failed:', err);
+    // Firebase မအလုပ်လုပ်ရင် localStorage ပဲ သိမ်း
+    const saved = JSON.parse(localStorage.getItem('vz_orders') || '[]');
+    saved.push(orderData);
+    localStorage.setItem('vz_orders', JSON.stringify(saved));
+    sendTelegramNotification(orderData);
+    cart = []; saveCart();
+    showConfirm(orderData);
+    showStep(3);
   }
 }
 
+// ── TELEGRAM ──
+async function sendTelegramNotification(order) {
+  if (TELEGRAM_BOT_TOKEN === 'YOUR_BOT_TOKEN_HERE') return;
+  const payLabels = { cod:'Cash on Delivery 🚚', kbzpay:'KBZPay 📱', wavepay:'WavePay 💜' };
+  const itemsList = order.items.map(i => '  • ' + i.icon + ' ' + i.name + ' x' + i.qty + ' — ' + (i.price * i.qty).toLocaleString() + ' MMK').join('\n');
+  const msg = '🛒 *NEW ORDER — VibeZee*\n━━━━━━━━━━━━━━━━━━━\n📦 Order ID: ' + order.orderId + '\n📅 ' + order.date + '\n\n👤 *Customer*\n• ' + order.name + '\n• ' + order.phone + '\n• ' + order.address + '\n• ' + order.township + ' (' + order.zone + ')\n\n🛍 *Items*\n' + itemsList + '\n\n💰 *Payment*\n• Subtotal: ' + order.subtotal.toLocaleString() + ' MMK\n• Delivery: ' + order.deliveryFee.toLocaleString() + ' MMK\n• *Total: ' + order.total.toLocaleString() + ' MMK*\n• ' + (payLabels[order.payment] || order.payment) + (order.note ? '\n\n📝 ' + order.note : '') + '\n━━━━━━━━━━━━━━━━━━━\n✅ PENDING';
+  try {
+    await fetch('https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: msg, parse_mode: 'Markdown' }),
+    });
+  } catch (e) { console.warn('Telegram failed:', e); }
+}
+
+// ── CONFIRM PAGE ──
 function showConfirm(order) {
   const payLabels = { cod:'Cash on Delivery', kbzpay:'KBZPay', wavepay:'WavePay' };
   const el = document.getElementById('confirmDetails');
@@ -394,10 +329,10 @@ function showConfirm(order) {
     <div class="confirm-row"><span>Phone</span><span class="confirm-val">${order.phone}</span></div>
     <div class="confirm-row"><span>Township</span><span class="confirm-val">${order.township}</span></div>
     <div class="confirm-row"><span>Zone</span><span class="confirm-val">${order.zone}</span></div>
-    <div class="confirm-row"><span>Payment</span><span class="confirm-val">${payLabels[order.payment] || order.payment}</span></div>
+    <div class="confirm-row"><span>Payment</span><span class="confirm-val">${payLabels[order.payment]||order.payment}</span></div>
     <div class="confirm-row"><span>Subtotal</span><span class="confirm-val">${order.subtotal.toLocaleString()} MMK</span></div>
     <div class="confirm-row"><span>Delivery</span><span class="confirm-val">${order.deliveryFee.toLocaleString()} MMK</span></div>
-    <div class="confirm-row"><span>Total</span><span class="confirm-val" style="color:var(--purple);font-family:var(--font-display);font-weight:700;">${order.total.toLocaleString()} MMK</span></div>
+    <div class="confirm-row"><span>Total</span><span class="confirm-val" style="color:#2563eb;font-weight:700;">${order.total.toLocaleString()} MMK</span></div>
     <div class="confirm-row"><span>Status</span><span class="order-status status-pending">PENDING</span></div>
   `;
   const msgEl = document.getElementById('confirmMessage');
@@ -409,16 +344,28 @@ function updateCartCount() {
   const c = JSON.parse(localStorage.getItem('vz_cart') || '[]');
   document.querySelectorAll('.cart-count').forEach(el => el.textContent = c.length);
 }
+
 function showToast(msg) {
-  const t = document.getElementById('toast'); if (!t) return;
-  t.textContent = msg; t.classList.add('show');
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
 }
-function toggleMenu() { document.getElementById('mobileMenu')?.classList.toggle('open'); }
-window.toggleMenu = toggleMenu;
+
+function toggleMenu() {
+  document.getElementById('mobileMenu')?.classList.toggle('open');
+}
 
 // ── INIT ──
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
+  // Login စစ်တယ်
+  const user = localStorage.getItem('vz_user');
+  if (!user) {
+    window.location.href = 'login.html';
+    return;
+  }
+
   renderCart();
   updateCartCount();
   buildTownshipDropdown();
