@@ -23,6 +23,7 @@
 
   <div class="noise"></div>
 
+  <!-- NAV -->
   <nav class="navbar">
     <div class="nav-logo">
       <a href="index.html"><span class="logo-vibe">VIBE</span><span class="logo-zee">ZEE</span></a>
@@ -38,6 +39,7 @@
     </div>
   </nav>
 
+  <!-- Mobile Menu -->
   <div class="mobile-menu" id="mobileMenu">
     <a href="index.html">HOME</a>
     <a href="shop.html">SHOP</a>
@@ -45,6 +47,7 @@
     <a href="login.html">LOGIN</a>
   </div>
 
+  <!-- PAGE HEADER -->
   <section class="page-header">
     <div class="hero-bg-grid"></div>
     <div class="hero-glow glow-purple"></div>
@@ -54,35 +57,42 @@
     </div>
   </section>
 
+  <!-- STEPS -->
   <div class="checkout-steps">
-    <div class="step-item active" id="step-1-indicator">
+    <div class="step active" id="step-cart-tab">
       <span class="step-num">01</span>
       <span class="step-label">CART</span>
     </div>
     <div class="step-line"></div>
-    <div class="step-item" id="step-2-indicator">
+    <div class="step" id="step-checkout-tab">
       <span class="step-num">02</span>
       <span class="step-label">CHECKOUT</span>
     </div>
     <div class="step-line"></div>
-    <div class="step-item" id="step-3-indicator">
+    <div class="step" id="step-confirm-tab">
       <span class="step-num">03</span>
       <span class="step-label">CONFIRM</span>
     </div>
   </div>
 
+  <!-- MAIN -->
   <div class="cart-wrapper">
 
-    <div class="checkout-step" id="step-1">
+    <!-- ── STEP 1: CART ── -->
+    <div class="cart-step" id="step-cart">
       <div class="cart-layout">
+
+        <!-- Cart Items -->
         <div class="cart-items-wrap">
           <div class="cart-items-header">
-            <h2 class="cart-section-title">ITEMS <span id="cartItemCount">(0)</span></h2>
+            <h2 class="cart-section-title">ITEMS <span id="itemCount">(0)</span></h2>
             <button class="btn-clear" onclick="clearCart()">✕ CLEAR ALL</button>
           </div>
           <div id="cartItems">
-            </div>
+            <!-- Rendered by JS -->
+          </div>
 
+          <!-- Empty -->
           <div class="cart-empty" id="cartEmpty" style="display:none;">
             <div class="empty-icon">🛒</div>
             <h3>Your cart is empty</h3>
@@ -91,126 +101,171 @@
           </div>
         </div>
 
-        <div class="order-summary">
+        <!-- Order Summary -->
+        <div class="order-summary" id="orderSummary">
           <h2 class="cart-section-title">SUMMARY</h2>
           <div class="summary-rows">
             <div class="summary-row">
               <span>Subtotal</span>
-              <span id="subtotalAmt">0 MMK</span>
+              <span id="subtotal">0 MMK</span>
             </div>
             <div class="summary-row">
               <span>Delivery</span>
-              <span id="deliveryAmt" class="text-cyan">မြို့နယ် ရွေးပါ</span>
+              <span id="deliveryFee" class="text-cyan">Free</span>
             </div>
             <div class="summary-row summary-total">
               <span>TOTAL</span>
-              <span id="totalAmt">0 MMK</span>
+              <span id="totalPrice">0 MMK</span>
             </div>
           </div>
+
+          <!-- Payment Method -->
+          <div class="payment-select">
+            <h3 class="payment-title">PAYMENT METHOD</h3>
+            <label class="payment-option">
+              <input type="radio" name="payment" value="cod" checked/>
+              <div class="payment-card">
+                <span class="payment-icon">🚚</span>
+                <div>
+                  <strong>Cash on Delivery</strong>
+                  <p>Pay when you receive</p>
+                </div>
+                <span class="payment-check">✓</span>
+              </div>
+            </label>
+            <label class="payment-option">
+              <input type="radio" name="payment" value="kbzpay"/>
+              <div class="payment-card">
+                <span class="payment-icon">📱</span>
+                <div>
+                  <strong>KBZPay</strong>
+                  <p>09xxxxxxxx</p>
+                </div>
+                <span class="payment-check">✓</span>
+              </div>
+            </label>
+            <label class="payment-option">
+              <input type="radio" name="payment" value="wavepay"/>
+              <div class="payment-card">
+                <span class="payment-icon">💜</span>
+                <div>
+                  <strong>WavePay</strong>
+                  <p>09xxxxxxxx</p>
+                </div>
+                <span class="payment-check">✓</span>
+              </div>
+            </label>
+          </div>
+
           <button class="btn-primary btn-full" id="btnCheckout" onclick="goToCheckout()">
             PROCEED TO CHECKOUT <span class="btn-arrow">→</span>
           </button>
-          <a href="shop.html" class="btn-continue" style="display: block; text-align: center; margin-top: 1rem;">← CONTINUE SHOPPING</a>
+          <a href="shop.html" class="btn-continue">← CONTINUE SHOPPING</a>
         </div>
       </div>
     </div>
 
-    <div class="checkout-step" id="step-2" style="display:none;">
+    <!-- ── STEP 2: CHECKOUT ── -->
+    <div class="cart-step" id="step-checkout" style="display:none;">
       <div class="cart-layout">
+
         <div class="checkout-form-wrap">
           <h2 class="cart-section-title">DELIVERY INFO</h2>
           <div class="form-grid">
             <div class="form-group">
               <label>Full Name *</label>
-              <input type="text" id="checkName" placeholder="Ko Mg Mg" class="form-input"/>
+              <input type="text" id="fname" placeholder="Ko Mg Mg" class="form-input"/>
             </div>
             <div class="form-group">
               <label>Phone Number *</label>
-              <input type="tel" id="checkPhone" placeholder="09xxxxxxxxx" class="form-input"/>
+              <input type="tel" id="fphone" placeholder="09xxxxxxxxx" class="form-input"/>
             </div>
             <div class="form-group form-full">
               <label>Address *</label>
-              <input type="text" id="checkAddress" placeholder="Street, Ward..." class="form-input"/>
+              <input type="text" id="faddress" placeholder="Street, Ward, Township..." class="form-input"/>
             </div>
             <div class="form-group">
-              <label>Township *</label>
-              <select id="checkTownship" class="form-input">
-                </select>
-              <small id="zoneInfo" style="display:none; color:#7c3aed; margin-top:5px; font-weight:600;"></small>
+              <label>City *</label>
+              <select id="fcity" class="form-input">
+                <option value="">Select City</option>
+                <option>Yangon</option>
+                <option>Mandalay</option>
+                <option>Naypyidaw</option>
+                <option>Bago</option>
+                <option>Pathein</option>
+                <option>Mawlamyine</option>
+                <option>Other</option>
+              </select>
             </div>
             <div class="form-group">
               <label>Note (Optional)</label>
-              <input type="text" id="checkNote" placeholder="Special instructions..." class="form-input"/>
+              <input type="text" id="fnote" placeholder="Special instructions..." class="form-input"/>
             </div>
           </div>
 
-          <div class="payment-select" style="margin-top:2rem;">
-            <h3 class="payment-title">PAYMENT METHOD</h3>
-            <div style="display:grid; gap:10px;">
-              <div class="payment-card active" data-payment="cod" onclick="selectPayment('cod')">
-                <span class="payment-icon">🚚</span>
-                <div><strong>Cash on Delivery</strong><p>Pay on arrival</p></div>
-              </div>
-              <div class="payment-card" data-payment="kbzpay" onclick="selectPayment('kbzpay')">
-                <span class="payment-icon">📱</span>
-                <div><strong>KBZPay</strong><p>Fast payment</p></div>
-              </div>
-              <div class="payment-card" data-payment="wavepay" onclick="selectPayment('wavepay')">
-                <span class="payment-icon">💜</span>
-                <div><strong>WavePay</strong><p>Easy transfer</p></div>
-              </div>
-            </div>
+          <!-- Payment reminder -->
+          <div class="payment-reminder" id="paymentReminder">
+            <!-- Rendered by JS -->
           </div>
         </div>
 
+        <!-- Right: Mini summary -->
         <div class="order-summary">
-          <h2 class="cart-section-title">FINAL TOTAL</h2>
-          <div class="summary-rows">
+          <h2 class="cart-section-title">ORDER</h2>
+          <div id="miniOrderList" class="mini-order-list"></div>
+          <div class="summary-rows" style="margin-top:1.5rem;">
             <div class="summary-row summary-total">
-              <span id="summaryTotal">0 MMK</span>
+              <span>TOTAL</span>
+              <span id="totalPrice2">0 MMK</span>
             </div>
           </div>
-          <button class="btn-primary btn-full" id="btnPlaceOrder" onclick="placeOrder()">
+          <button class="btn-primary btn-full" onclick="placeOrder()">
             PLACE ORDER <span class="btn-arrow">→</span>
           </button>
-          <button class="btn-continue" onclick="goBackToCart()" style="width:100%; margin-top:1rem;">← BACK TO CART</button>
+          <button class="btn-continue" onclick="backToCart()">← BACK TO CART</button>
         </div>
       </div>
     </div>
 
-    <div class="checkout-step" id="step-3" style="display:none;">
-      <div class="confirm-wrap" style="text-align:center; padding: 3rem 1rem;">
-        <div class="confirm-icon" style="font-size:4rem; margin-bottom:1rem;">✅</div>
-        <h2 class="confirm-title" style="font-family:'Orbitron';">ORDER PLACED!</h2>
-        <p id="confirmMessage" class="confirm-sub">မှာယူမှု အောင်မြင်ပါသည်။</p>
-        <div class="confirm-details" id="confirmDetails" style="background:#fff; padding:1.5rem; border-radius:12px; margin:2rem auto; max-width:400px; text-align:left; border:1px solid #e2e8f0;">
-          </div>
+    <!-- ── STEP 3: CONFIRM ── -->
+    <div class="cart-step" id="step-confirm" style="display:none;">
+      <div class="confirm-wrap">
+        <div class="confirm-icon">✅</div>
+        <h2 class="confirm-title">ORDER PLACED!</h2>
+        <p class="confirm-sub">သင့် order ကို Telegram မှတဆင့် ကျွန်တော်တို့ ဆီ ရောက်ပြီပြီ။<br/>မကြာမီ ဆက်သွယ်ပေးပါမည်။</p>
+        <div class="confirm-order-id">ORDER ID: <span id="confirmOrderId">#VZ-000000</span></div>
+        <div class="confirm-details" id="confirmDetails"></div>
         <div class="confirm-actions">
-          <a href="shop.html" class="btn-primary">CONTINUE SHOPPING</a>
-          <a href="index.html" class="btn-ghost" style="margin-left:10px;">HOME</a>
+          <a href="shop.html" class="btn-primary">CONTINUE SHOPPING <span class="btn-arrow">→</span></a>
+          <a href="index.html" class="btn-ghost">GO HOME</a>
         </div>
       </div>
     </div>
+
   </div>
 
+  <!-- Toast -->
   <div class="toast" id="toast"></div>
 
+  <!-- Footer -->
   <footer class="footer">
-    <div class="footer-bottom" style="border-top:none; padding-top:2rem; text-align:center;">
+    <div class="footer-bottom" style="border-top:none;padding-top:0;">
       <p>© 2025 VibeZee. All rights reserved.</p>
+      <p>Made with ⚡ in Myanmar</p>
     </div>
   </footer>
 
+  <!-- Firebase CDN -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script>
     firebase.initializeApp({
-      apiKey: "AIzaSyBNeNP79jp1mr894citf2V5RHN4UQCCWaU",
-      authDomain: "vibezee-845ba.firebaseapp.com",
-      projectId: "vibezee-845ba",
-      storageBucket: "vibezee-845ba.firebasestorage.app",
+      apiKey:            "AIzaSyBNeNP79jp1mr894citf2V5RHN4UQCCWaU",
+      authDomain:        "vibezee-845ba.firebaseapp.com",
+      projectId:         "vibezee-845ba",
+      storageBucket:     "vibezee-845ba.firebasestorage.app",
       messagingSenderId: "456545528983",
-      appId: "1:456545528983:web:8ace5d1c6a49acf68fcdd2"
+      appId:             "1:456545528983:web:8ace5d1c6a49acf68fcdd2"
     });
   </script>
   <script src="js/main.js"></script>
