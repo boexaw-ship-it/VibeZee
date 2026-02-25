@@ -7,12 +7,43 @@ import {
   collection, addDoc, serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// ── PRODUCTS ──
+// ── PRODUCTS (shop.js နဲ့ sync) ──
 const PRODUCTS = {
-  1: { name:'ProSound X1 Gaming Earphones', price:25000, icon:'🎧' },
-  2: { name:'MechStrike TKL Keyboard',       price:85000, icon:'⌨️' },
-  3: { name:'VortexClick Pro Gaming Mouse',  price:45000, icon:'🖱' },
-  4: { name:'ClearVoice USB Condenser Mic',  price:55000, icon:'🎙' },
+  101: { name:'Creative Sound Blaster X3',       price:85000,  icon:'🔊' },
+  102: { name:'ASUS Xonar SE Sound Card',         price:65000,  icon:'🔊' },
+  103: { name:'StarTech 7.1 USB Audio Card',      price:28000,  icon:'🔊' },
+  201: { name:'HyperX QuadCast USB Mic',          price:120000, icon:'🎙' },
+  202: { name:'Blue Snowball iCE Condenser',      price:55000,  icon:'🎙' },
+  203: { name:'Fifine K678 USB Microphone',       price:32000,  icon:'🎙' },
+  204: { name:'BOYA BY-PM500 Studio Mic',         price:48000,  icon:'🎙' },
+  301: { name:'JBL Quantum 50 Gaming Earbuds',    price:35000,  icon:'🎧' },
+  302: { name:'Razer Hammerhead V2',              price:45000,  icon:'🎧' },
+  303: { name:'SteelSeries Tusq Earbuds',         price:28000,  icon:'🎧' },
+  304: { name:'Samsung AKG Wired Earphones',      price:18000,  icon:'🎧' },
+  401: { name:'Redragon K552 Mechanical TKL',     price:55000,  icon:'⌨️' },
+  402: { name:'Havit HV-KB395L RGB Keyboard',     price:38000,  icon:'⌨️' },
+  403: { name:'MechStrike Pro Full-Size RGB',     price:85000,  icon:'⌨️' },
+  404: { name:'Tecware Phantom TKL Mech',         price:65000,  icon:'⌨️' },
+  501: { name:'Logitech G302 Gaming Mouse',       price:45000,  icon:'🖱' },
+  502: { name:'Razer DeathAdder V3',              price:95000,  icon:'🖱' },
+  503: { name:'Redragon M711 Cobra Mouse',        price:25000,  icon:'🖱' },
+  504: { name:'Havit MS1016 RGB Gaming Mouse',    price:20000,  icon:'🖱' },
+  601: { name:'Xbox Wireless Controller',         price:85000,  icon:'🕹' },
+  602: { name:'PS5 DualSense Controller',         price:115000, icon:'🕹' },
+  603: { name:'Logitech F310 Gamepad',            price:38000,  icon:'🕹' },
+  701: { name:'SanDisk Ultra 64GB USB 3.0',       price:18000,  icon:'💾' },
+  702: { name:'Kingston DataTraveler 128GB',      price:28000,  icon:'💾' },
+  703: { name:'Samsung BAR Plus 32GB',            price:12000,  icon:'💾' },
+  704: { name:'Toshiba TransMemory 256GB',        price:45000,  icon:'💾' },
+  801: { name:'Seagate Barracuda 1TB HDD',        price:55000,  icon:'🗄' },
+  802: { name:'WD Blue 2TB Internal HDD',         price:85000,  icon:'🗄' },
+  803: { name:'Samsung 870 EVO 500GB SSD',        price:95000,  icon:'🗄' },
+  804: { name:'Kingston A400 240GB SSD',          price:48000,  icon:'🗄' },
+  805: { name:'Toshiba Canvio 1TB Portable',      price:68000,  icon:'🗄' },
+  901: { name:'Anker 100W USB-C Charging Cable',  price:18000,  icon:'🔌' },
+  902: { name:'Baseus 7-in-1 USB-C Hub',          price:45000,  icon:'🔌' },
+  903: { name:'Ugreen USB-C to HDMI Adapter',     price:22000,  icon:'🔌' },
+  904: { name:'Aukey 5-Port USB-C Hub',           price:35000,  icon:'🔌' },
 };
 
 // ── DELIVERY ZONES ──
@@ -79,7 +110,7 @@ Object.entries(DELIVERY_ZONES).forEach(([zoneKey, zoneData]) => {
 });
 
 // ── CART STATE ──
-let cart = JSON.parse(localStorage.getItem('vz_cart') || '[]');
+let cart = JSON.parse(localStorage.getItem('vz_cart') || '[]').map(Number);
 let currentStep    = 1;
 let selectedPayment = 'cod';
 let selectedTownship = '';
