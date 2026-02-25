@@ -7,6 +7,11 @@ import {
   collection, addDoc, serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+// ── TELEGRAM CONFIG ──
+// ⚠️ ဒီနေရာမှာ ကိုယ့် Token နဲ့ Group ID ထည့်ပါ
+const TELEGRAM_BOT_TOKEN = 'YOUR_BOT_TOKEN_HERE';   // ← Line 11: BotFather က ရတဲ့ token
+const TELEGRAM_CHAT_ID   = 'YOUR_GROUP_ID_HERE';    // ← Line 12: Group ID (- နဲ့ စတတ်တယ်)
+
 // ── PRODUCTS (shop.js နဲ့ sync) ──
 const PRODUCTS = {
   101: { name:'Creative Sound Blaster X3',       price:85000,  icon:'🔊' },
@@ -315,6 +320,7 @@ window.placeOrder = async function() {
     localStorage.setItem('vz_orders', JSON.stringify(saved));
 
     cart = []; saveCart();
+    sendTelegramNotification(orderData); // Telegram notify
     showConfirm(orderData);
     showStep(3);
 
@@ -324,6 +330,59 @@ window.placeOrder = async function() {
     if (btn) { btn.disabled = false; btn.textContent = 'PLACE ORDER →'; }
   }
 };
+
+// ── TELEGRAM NOTIFICATION ──
+async function sendTelegramNotification(order) {
+  if (TELEGRAM_BOT_TOKEN === 'YOUR_BOT_TOKEN_HERE') return; // token မထည့်ရသေး
+
+  const payLabels = { cod: 'Cash on Delivery 🚚', kbzpay: 'KBZPay 📱', wavepay: 'WavePay 💜' };
+
+  const itemsList = order.items
+    .map(i => `  • ${i.icon} ${i.name} x${i.qty} — ${(i.price * i.qty).toLocaleString()} MMK`)
+    .join('
+');
+
+  const msg = `
+🛒 *NEW ORDER — VibeZee*
+━━━━━━━━━━━━━━━━━━━
+📦 Order ID: \`${order.orderId}\`
+📅 Date: ${order.date}
+
+👤 *Customer Info*
+• Name: ${order.name}
+• Phone: ${order.phone}
+• Address: ${order.address}
+• Township: ${order.township}
+• Zone: ${order.zone}
+
+🛍 *Items*
+${itemsList}
+
+💰 *Payment*
+• Subtotal: ${order.subtotal.toLocaleString()} MMK
+• Delivery: ${order.deliveryFee.toLocaleString()} MMK
+• *Total: ${order.total.toLocaleString()} MMK*
+• Method: ${payLabels[order.payment] || order.payment}
+
+${order.note ? '📝 Note: ' + order.note : ''}
+━━━━━━━━━━━━━━━━━━━
+✅ Status: PENDING
+  `.trim();
+
+  try {
+    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id:    TELEGRAM_CHAT_ID,
+        text:       msg,
+        parse_mode: 'Markdown',
+      }),
+    });
+  } catch (err) {
+    console.warn('Telegram notification failed:', err);
+  }
+}
 
 function showConfirm(order) {
   const payLabels = { cod:'Cash on Delivery', kbzpay:'KBZPay', wavepay:'WavePay' };
