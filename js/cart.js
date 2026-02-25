@@ -369,17 +369,23 @@ window.selectPayment    = selectPayment;
 window.toggleMenu       = toggleMenu;
 
 // ── INIT ──
-document.addEventListener('DOMContentLoaded', function() {
+function initCart() {
   // Login စစ်တယ်
   const user = localStorage.getItem('vz_user');
   if (!user) {
     window.location.href = 'login.html';
     return;
   }
-
   renderCart();
   updateCartCount();
   buildTownshipDropdown();
   showStep(1);
   selectPayment('cod');
-});
+}
+
+// DOM ready ဖြစ်သည်နှင့် တိုက်ရိုက် run
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initCart);
+} else {
+  initCart();
+}
