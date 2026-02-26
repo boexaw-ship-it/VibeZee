@@ -3,8 +3,8 @@
 // =============================================
 
 // ── TELEGRAM CONFIG ──
-const TELEGRAM_BOT_TOKEN = 'YOUR_BOT_TOKEN_HERE';  // ← ဒီနေရာ token ထည့်
-const TELEGRAM_CHAT_ID   = 'YOUR_GROUP_ID_HERE';   // ← ဒီနေရာ group id ထည့်
+const TELEGRAM_BOT_TOKEN = '8271893873:AAFW2t-Nr7qoKRoxVo9daYQCG5hBE6rscSs';  // ← ဒီနေရာ token ထည့်
+const TELEGRAM_CHAT_ID   = '-1003844393952';   // ← ဒီနေရာ group id ထည့်
 
 // ── PRODUCTS ──
 const PRODUCTS = {
