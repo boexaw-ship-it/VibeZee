@@ -1,0 +1,274 @@
+/* =============================================
+   VIBEZEE — Login CSS
+   ============================================= */
+
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 1.5rem 3rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-bg {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 60% at 80% 20%, rgba(0,230,118,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 20% 80%, rgba(0,200,83,0.04) 0%, transparent 60%);
+  pointer-events: none;
+}
+.login-grid {
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0,230,118,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,230,118,0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+}
+
+/* ── CARD ── */
+.login-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+}
+
+.login-logo {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.login-logo a {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: 3px;
+  text-decoration: none;
+}
+
+/* ── TABS ── */
+.auth-tabs {
+  display: flex;
+  background: var(--bg3);
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 2rem;
+  position: relative;
+}
+.tab-indicator {
+  position: absolute;
+  top: 4px; left: 4px;
+  width: calc(50% - 4px);
+  height: calc(100% - 8px);
+  background: var(--green);
+  border-radius: 8px;
+  transition: transform 0.3s ease;
+}
+.tab-indicator.right { transform: translateX(100%); }
+
+.tab-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 0.7rem;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--gray);
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  transition: color 0.3s;
+}
+.tab-btn.active { color: #000; }
+
+/* ── FORM ── */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.form-group { position: relative; }
+
+.form-label {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: var(--gray);
+  margin-bottom: 0.5rem;
+}
+
+.form-input {
+  width: 100%;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.95rem 1rem;
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-input::placeholder { color: var(--gray); font-size: 0.95rem; }
+.form-input:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(0,230,118,0.08);
+}
+.form-input.error   { border-color: #ff5252; }
+.form-input.success { border-color: var(--green); }
+
+/* Password wrap */
+.pw-wrap { position: relative; }
+.pw-wrap .form-input { padding-right: 3rem; }
+.pw-toggle {
+  position: absolute;
+  right: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  color: var(--gray);
+  padding: 4px;
+}
+
+/* Password strength */
+.pw-strength { margin-top: 0.5rem; }
+.pw-bar-wrap {
+  height: 4px;
+  background: var(--bg3);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 0.3rem;
+}
+.pw-bar {
+  height: 100%;
+  width: 0;
+  border-radius: 2px;
+  transition: width 0.3s, background 0.3s;
+}
+.pw-bar.weak   { width: 33%; background: #ff5252; }
+.pw-bar.medium { width: 66%; background: #ffd740; }
+.pw-bar.strong { width: 100%; background: var(--green); }
+.pw-label { font-size: 0.8rem; color: var(--gray); }
+
+/* Checkbox */
+.checkbox-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  cursor: pointer;
+}
+.checkbox-wrap input[type="checkbox"] {
+  width: 18px; height: 18px;
+  accent-color: var(--green);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.checkbox-label { font-size: 0.9rem; color: var(--gray); line-height: 1.4; }
+.checkbox-label a { color: var(--green); text-decoration: none; }
+.checkbox-label a:hover { text-decoration: underline; }
+
+/* ── AUTH MESSAGE ── */
+.auth-message {
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  display: none;
+  text-align: center;
+}
+.auth-message.success {
+  background: rgba(0,230,118,0.1);
+  border: 1px solid rgba(0,230,118,0.3);
+  color: var(--green);
+}
+.auth-message.error {
+  background: rgba(255,82,82,0.1);
+  border: 1px solid rgba(255,82,82,0.3);
+  color: #ff5252;
+}
+
+/* ── SUBMIT BTN ── */
+.btn-auth {
+  width: 100%;
+  background: var(--green);
+  color: #000;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  padding: 1.05rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+.btn-auth:hover {
+  background: var(--green2);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px var(--green-glow);
+}
+.btn-auth:disabled {
+  background: var(--border);
+  color: var(--gray);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+.btn-loader { display: none; }
+
+/* ── DIVIDER ── */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0.5rem 0;
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.auth-divider span { font-size: 0.8rem; color: var(--gray); }
+
+/* ── SWITCH LINK ── */
+.auth-switch {
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--gray);
+  margin-top: 0.5rem;
+}
+.auth-switch a {
+  color: var(--green);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+.auth-switch a:hover { text-decoration: underline; }
+
+@media (max-width: 480px) {
+  .login-card { padding: 2rem 1.5rem; }
+}
