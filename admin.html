@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin — VibeZee</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/admin.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body class="admin-body">
+
+<!-- ══════════════════════════════════════
+     ADMIN LOGIN SCREEN
+══════════════════════════════════════ -->
+<div id="adminLogin" class="admin-login" style="display:none;">
+  <div class="admin-login-card">
+    <div class="admin-login-icon">🔐</div>
+    <div class="admin-login-title">ADMIN PANEL</div>
+    <div class="admin-login-sub">VibeZee Admin Access</div>
+    <div class="admin-login-form">
+      <div>
+        <label class="modal-label">ADMIN EMAIL</label>
+        <input type="email" class="modal-input" id="adminEmail" placeholder="admin@vibezee.com"/>
+      </div>
+      <div>
+        <label class="modal-label">PASSWORD</label>
+        <input type="password" class="modal-input" id="adminPass" placeholder="••••••••"/>
+      </div>
+      <button class="btn-auth" id="btnAdminLogin" onclick="adminLogin()">
+        LOGIN →
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     ADMIN APP
+══════════════════════════════════════ -->
+<div id="adminApp" style="display:none;width:100%;min-height:100vh;display:flex;">
+
+  <!-- Mobile toggle -->
+  <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+
+  <!-- SIDEBAR -->
+  <aside class="admin-sidebar" id="adminSidebar">
+    <div class="sidebar-logo">
+      <span class="logo-vibe">VIBE</span><span class="logo-zee">ZEE</span>
+      <span class="sidebar-tag">// ADMIN PANEL</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-item active" data-panel="dashboard" onclick="showPanel('dashboard')">
+        <span class="nav-icon">📊</span> DASHBOARD
+      </a>
+      <a class="nav-item" data-panel="products" onclick="showPanel('products')">
+        <span class="nav-icon">📦</span> PRODUCTS
+      </a>
+      <a class="nav-item" data-panel="orders" onclick="showPanel('orders')">
+        <span class="nav-icon">🛒</span> ORDERS
+      </a>
+      <a class="nav-item" href="index.html" target="_blank" style="margin-top:auto;">
+        <span class="nav-icon">🌐</span> VIEW SITE
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <span class="admin-user" id="adminUserEmail"></span>
+      <button class="btn-logout" onclick="adminLogout()">🚪 LOGOUT</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <div>
+        <div class="admin-page-title" id="panelTitle">DASHBOARD</div>
+        <div class="admin-page-sub"   id="panelSub">Overview & Stats</div>
+      </div>
+    </div>
+
+    <!-- ── DASHBOARD PANEL ── -->
+    <div class="admin-panel active" id="panel-dashboard">
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-card-icon">🛒</div>
+          <div class="stat-card-val"  id="statOrders">—</div>
+          <div class="stat-card-label">TOTAL ORDERS</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon">💰</div>
+          <div class="stat-card-val"  id="statRevenue">—</div>
+          <div class="stat-card-label">TOTAL REVENUE</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon">⏳</div>
+          <div class="stat-card-val"  id="statPending">—</div>
+          <div class="stat-card-label">PENDING</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon">✅</div>
+          <div class="stat-card-val"  id="statDelivered">—</div>
+          <div class="stat-card-label">DELIVERED</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon">📦</div>
+          <div class="stat-card-val"  id="statProducts">—</div>
+          <div class="stat-card-label">PRODUCTS</div>
+        </div>
+      </div>
+
+      <!-- Recent Orders -->
+      <div class="admin-table-wrap">
+        <div class="table-header">
+          <div class="table-title">RECENT ORDERS</div>
+          <button class="btn-add" onclick="showPanel('orders')">VIEW ALL →</button>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>ORDER ID</th><th>CUSTOMER</th><th>TOTAL</th><th>STATUS</th><th>ACTION</th>
+              </tr>
+            </thead>
+            <tbody id="recentOrdersBody">
+              <tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--gray);">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PRODUCTS PANEL ── -->
+    <div class="admin-panel" id="panel-products">
+      <div class="admin-table-wrap">
+        <div class="table-header">
+          <div class="table-title">ALL PRODUCTS</div>
+          <div class="table-tools">
+            <input type="text" class="admin-search" id="productSearch" placeholder="Search products..."/>
+            <button class="btn-add" onclick="openAddProduct()">+ ADD PRODUCT</button>
+          </div>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th></th><th>PRODUCT</th><th>PRICE</th><th>BADGE</th><th>RATING</th><th>ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody id="productsBody">
+              <tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--gray);">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ORDERS PANEL ── -->
+    <div class="admin-panel" id="panel-orders">
+      <div class="admin-table-wrap">
+        <div class="table-header">
+          <div class="table-title">ALL ORDERS</div>
+          <div class="table-tools">
+            <input type="text" class="admin-search" id="orderSearch" placeholder="Search orders..."/>
+            <select class="admin-select" id="orderStatusFilter">
+              <option value="">ALL STATUS</option>
+              <option value="pending">PENDING</option>
+              <option value="confirmed">CONFIRMED</option>
+              <option value="delivered">DELIVERED</option>
+              <option value="cancelled">CANCELLED</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>ORDER ID</th><th>CUSTOMER</th><th>TOWNSHIP</th><th>TOTAL</th><th>PAYMENT</th><th>STATUS</th><th>ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody id="ordersBody">
+              <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--gray);">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ══════════════════════════════════════
+     PRODUCT MODAL
+══════════════════════════════════════ -->
+<div class="modal-overlay" id="productModal" style="display:none;">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="productModalTitle">ADD PRODUCT</div>
+      <button class="modal-close" onclick="closeProductModal()">✕</button>
+    </div>
+    <form class="modal-form" id="productForm" onsubmit="return false;">
+      <div>
+        <label class="modal-label">PRODUCT NAME *</label>
+        <input type="text" class="modal-input" id="pName" placeholder="Razer DeathAdder V3"/>
+      </div>
+      <div class="modal-row">
+        <div>
+          <label class="modal-label">CATEGORY *</label>
+          <select class="modal-select" id="pCat">
+            <option value="">-- ရွေးပါ --</option>
+            <option value="sound-cards">Sound Cards</option>
+            <option value="microphones">Microphones</option>
+            <option value="earphones">Earphones</option>
+            <option value="keyboards">Keyboards</option>
+            <option value="mouse">Mouse</option>
+            <option value="joysticks">Joysticks</option>
+            <option value="memory">Memory Sticks</option>
+            <option value="harddisk">Hard Disks</option>
+            <option value="usbc">USB Type-C</option>
+          </select>
+        </div>
+        <div>
+          <label class="modal-label">ICON (emoji)</label>
+          <input type="text" class="modal-input" id="pIcon" placeholder="🖱"/>
+        </div>
+      </div>
+      <div class="modal-row">
+        <div>
+          <label class="modal-label">PRICE (MMK) *</label>
+          <input type="number" class="modal-input" id="pPrice" placeholder="45000"/>
+        </div>
+        <div>
+          <label class="modal-label">BADGE</label>
+          <select class="modal-select" id="pBadge">
+            <option value="">None</option>
+            <option value="HOT">HOT</option>
+            <option value="NEW">NEW</option>
+            <option value="SALE">SALE</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-row">
+        <div>
+          <label class="modal-label">RATING (1-5)</label>
+          <input type="number" class="modal-input" id="pRating" min="1" max="5" placeholder="5"/>
+        </div>
+        <div>
+          <label class="modal-label">REVIEWS COUNT</label>
+          <input type="number" class="modal-input" id="pReviews" placeholder="0"/>
+        </div>
+      </div>
+      <div>
+        <label class="modal-label">DESCRIPTION</label>
+        <textarea class="modal-textarea" id="pDesc" placeholder="Product description..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-modal-cancel" onclick="closeProductModal()">CANCEL</button>
+        <button type="button" class="btn-modal-save"   id="btnSaveProduct" onclick="saveProduct()">SAVE</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     ORDER DETAIL MODAL
+══════════════════════════════════════ -->
+<div class="modal-overlay" id="orderDetailModal" style="display:none;">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <div class="modal-title">ORDER DETAILS</div>
+      <button class="modal-close" onclick="closeOrderModal()">✕</button>
+    </div>
+    <div id="orderDetailContent"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="admin-toast" id="adminToast"></div>
+
+<!-- Firebase CDN -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+  firebase.initializeApp({
+    apiKey:            "AIzaSyBNeNP79jp1mr894citf2V5RHN4UQCCWaU",
+    authDomain:        "vibezee-845ba.firebaseapp.com",
+    projectId:         "vibezee-845ba",
+    storageBucket:     "vibezee-845ba.firebasestorage.app",
+    messagingSenderId: "456545528983",
+    appId:             "1:456545528983:web:8ace5d1c6a49acf68fcdd2"
+  });
+</script>
+<script src="js/admin.js"></script>
+</body>
+</html>
