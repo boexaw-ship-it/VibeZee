@@ -129,11 +129,18 @@ function renderCart() {
 function renderSummary() {
   const subtotal = getSubtotal();
   const total    = subtotal + deliveryFee;
+  const deliveryText = deliveryFee === 0 ? (selectedTownship ? 'FREE' : '—') : deliveryFee.toLocaleString() + ' MMK';
   const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-  set('subtotalAmt',   subtotal.toLocaleString()  + ' MMK');
-  set('deliveryAmt',   deliveryFee === 0 ? (selectedTownship ? 'FREE' : '—') : deliveryFee.toLocaleString() + ' MMK');
-  set('totalAmt',      total.toLocaleString()     + ' MMK');
-  set('summaryTotal',  total.toLocaleString()     + ' MMK');
+
+  // Step 1 summary
+  set('subtotalAmt', subtotal.toLocaleString() + ' MMK');
+  set('deliveryAmt', deliveryText);
+  set('totalAmt',    total.toLocaleString() + ' MMK');
+
+  // Step 2 mini summary
+  set('summarySubtotal', subtotal.toLocaleString() + ' MMK');
+  set('summaryDelivery', deliveryText);
+  set('summaryTotal',    total.toLocaleString() + ' MMK');
 }
 
 // ── QTY & REMOVE ──
@@ -183,9 +190,13 @@ function buildTownshipDropdown() {
     deliveryFee = zk ? DELIVERY_ZONES[zk].fee : 0;
     renderSummary();
     const zi = document.getElementById('zoneInfo');
-    if (zi && zk) {
-      zi.textContent = '📍 ' + DELIVERY_ZONES[zk].label + ' — ' + deliveryFee.toLocaleString() + ' MMK';
-      zi.style.display = 'block';
+    if (zi) {
+      if (zk) {
+        zi.textContent = '📍 ' + DELIVERY_ZONES[zk].label + ' — ' + deliveryFee.toLocaleString() + ' MMK';
+        zi.style.display = 'block';
+      } else {
+        zi.style.display = 'none';
+      }
     }
   });
 }
@@ -213,6 +224,7 @@ function showStep(n) {
 
 function goToCheckout() {
   if (getCartItems().length === 0) { showToast('⚠ Cart ထဲ ပစ္စည်း မရှိဘူး'); return; }
+  renderSummary();
   showStep(2);
 }
 window.goToCheckout = goToCheckout;
