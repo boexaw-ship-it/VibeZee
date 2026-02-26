@@ -155,8 +155,10 @@ function removeItem(id) {
 window.removeItem = removeItem;
 
 function clearCart() {
-  if (!confirm('Cart ကို အကုန် ဖျက်မှာ သေချာပါသလား?')) return;
-  cart = []; saveCart(); renderCart();
+  vzConfirm('🗑️', 'CLEAR CART', 'Cart ထဲက ပစ္စည်းအကုန် ဖျက်မှာ သေချာပါသလား?', 'CLEAR ALL', () => {
+    cart = []; saveCart(); renderCart();
+    showToast('🗑 Cart ကို ရှင်းလင်းပြီးပါပြီ');
+  });
 }
 window.clearCart = clearCart;
 
@@ -343,6 +345,27 @@ function showToast(msg) {
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── CUSTOM CONFIRM ──
+function vzConfirm(icon, title, msg, confirmText, onConfirm) {
+  const overlay = document.createElement('div');
+  overlay.className = 'vz-overlay';
+  overlay.innerHTML = `
+    <div class="vz-dialog">
+      <div class="vz-dialog-icon">${icon}</div>
+      <div class="vz-dialog-title">${title}</div>
+      <div class="vz-dialog-msg">${msg}</div>
+      <div class="vz-dialog-btns">
+        <button class="vz-btn-cancel" id="vzCancel">CANCEL</button>
+        <button class="vz-btn-confirm" id="vzConfirmBtn">${confirmText}</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  document.getElementById('vzCancel').onclick    = () => overlay.remove();
+  document.getElementById('vzConfirmBtn').onclick = () => { overlay.remove(); onConfirm(); };
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
 }
 
 // ── INIT ──
