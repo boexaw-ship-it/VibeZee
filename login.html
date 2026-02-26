@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login — VibeZee</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/login.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html">HOME</a>
+    <a href="shop.html">SHOP</a>
+    <a href="cart.html">CART</a>
+    <a href="login.html" class="active">LOGIN</a>
+  </div>
+
+  <!-- NAV -->
+  <nav class="navbar">
+    <div class="nav-logo" onclick="location.href='index.html'">
+      <span class="logo-vibe">VIBE</span><span class="logo-zee">ZEE</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html">HOME</a></li>
+      <li><a href="shop.html">SHOP</a></li>
+      <li><a href="cart.html">CART <span class="cart-badge cart-count">0</span></a></li>
+      <li><a href="login.html" class="btn-nav active">LOGIN</a></li>
+    </ul>
+    <div class="nav-hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+
+  <!-- BG -->
+  <div class="login-bg"></div>
+  <div class="login-grid"></div>
+
+  <!-- LOGIN PAGE -->
+  <div class="login-page">
+    <div class="login-card">
+
+      <!-- Logo -->
+      <div class="login-logo">
+        <a href="index.html">
+          <span class="logo-vibe">VIBE</span><span class="logo-zee">ZEE</span>
+        </a>
+      </div>
+
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <div class="tab-indicator" id="tabIndicator"></div>
+        <button class="tab-btn active" id="tabLogin" onclick="switchTab('login')">LOGIN</button>
+        <button class="tab-btn" id="tabRegister" onclick="switchTab('register')">REGISTER</button>
+      </div>
+
+      <!-- Message -->
+      <div class="auth-message" id="authMessage"></div>
+
+      <!-- ── LOGIN FORM ── -->
+      <form class="auth-form" id="formLogin" onsubmit="return false;">
+        <div class="form-group">
+          <label class="form-label">EMAIL</label>
+          <input type="email" class="form-input" id="loginEmail" placeholder="you@example.com"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">PASSWORD</label>
+          <div class="pw-wrap">
+            <input type="password" class="form-input" id="loginPassword" placeholder="••••••••"/>
+            <button type="button" class="pw-toggle" onclick="togglePassword('loginPassword', this)">👁</button>
+          </div>
+        </div>
+        <button type="button" class="btn-auth" id="btnLogin" onclick="handleLogin()">
+          <span class="btn-text">LOGIN</span>
+          <span class="btn-loader">⏳</span>
+          <span class="btn-arrow">→</span>
+        </button>
+        <div class="auth-divider"><span>or</span></div>
+        <div class="auth-switch">
+          Account မရှိသေးဘူးလား?
+          <a onclick="switchTab('register')">Register ဝင်ပါ</a>
+        </div>
+      </form>
+
+      <!-- ── REGISTER FORM ── -->
+      <form class="auth-form" id="formRegister" style="display:none;" onsubmit="return false;">
+        <div class="form-group">
+          <label class="form-label">FULL NAME</label>
+          <input type="text" class="form-input" id="regName" placeholder="Ko Mg Mg"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">EMAIL</label>
+          <input type="email" class="form-input" id="regEmail" placeholder="you@example.com"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">PHONE NUMBER</label>
+          <input type="tel" class="form-input" id="regPhone" placeholder="09xxxxxxxxx"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">PASSWORD</label>
+          <div class="pw-wrap">
+            <input type="password" class="form-input" id="regPassword"
+              placeholder="Min 8 characters"
+              oninput="checkPasswordStrength(this.value)"/>
+            <button type="button" class="pw-toggle" onclick="togglePassword('regPassword', this)">👁</button>
+          </div>
+          <div class="pw-strength">
+            <div class="pw-bar-wrap"><div class="pw-bar" id="pwBar"></div></div>
+            <span class="pw-label" id="pwLabel"></span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">CONFIRM PASSWORD</label>
+          <div class="pw-wrap">
+            <input type="password" class="form-input" id="regConfirm" placeholder="••••••••"/>
+            <button type="button" class="pw-toggle" onclick="togglePassword('regConfirm', this)">👁</button>
+          </div>
+        </div>
+        <label class="checkbox-wrap">
+          <input type="checkbox" id="agreeTerms"/>
+          <span class="checkbox-label">
+            <a href="#">Terms & Conditions</a> နှင့် <a href="#">Privacy Policy</a> ကို သဘောတူသည်
+          </span>
+        </label>
+        <button type="button" class="btn-auth" id="btnRegister" onclick="handleRegister()">
+          <span class="btn-text">CREATE ACCOUNT</span>
+          <span class="btn-loader">⏳</span>
+          <span class="btn-arrow">→</span>
+        </button>
+        <div class="auth-divider"><span>or</span></div>
+        <div class="auth-switch">
+          Account ရှိပြီးသားလား?
+          <a onclick="switchTab('login')">Login ဝင်ပါ</a>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- Firebase CDN -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script>
+    firebase.initializeApp({
+      apiKey:            "AIzaSyBNeNP79jp1mr894citf2V5RHN4UQCCWaU",
+      authDomain:        "vibezee-845ba.firebaseapp.com",
+      projectId:         "vibezee-845ba",
+      storageBucket:     "vibezee-845ba.firebasestorage.app",
+      messagingSenderId: "456545528983",
+      appId:             "1:456545528983:web:8ace5d1c6a49acf68fcdd2"
+    });
+  </script>
+  <script src="js/main.js"></script>
+  <script src="js/login.js"></script>
+</body>
+</html>
