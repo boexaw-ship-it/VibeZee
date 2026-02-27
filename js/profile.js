@@ -48,10 +48,28 @@ function listenOrders(uid) {
       const orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       renderOrders(orders);
     }, err => {
-      console.error(err);
-      // fallback localStorage
-      const local = JSON.parse(localStorage.getItem('vz_orders')||'[]');
-      renderOrders(local.reverse());
+      console.error('Firestore error:', err.code, err.message);
+      if (err.code === 'failed-precondition') {
+        // index မရှိသေးဘူး — index link ပြမည်
+        const wrap = document.getElementById('ordersList');
+        if (wrap) wrap.innerHTML = `
+          <div style="text-align:center;padding:2rem;background:var(--card);border:1px solid var(--border);border-radius:14px;">
+            <div style="font-size:2rem;margin-bottom:0.8rem;">⚠️</div>
+            <div style="font-family:var(--font-display);font-size:0.85rem;color:var(--white);margin-bottom:0.5rem;">INDEX လိုအပ်သည်</div>
+            <p style="font-size:0.9rem;color:var(--gray);margin-bottom:1rem;">Firebase Console → Firestore → Indexes မှာ<br><strong style="color:var(--green);">uid + createdAt</strong> index ဆောက်ပါ</p>
+            <p style="font-size:0.8rem;color:var(--gray);">Console error ထဲမှာ link ပေးထားသည် — ထို link နှိပ်ပြီး Create Index နှိပ်ပါ</p>
+          </div>`;
+      } else {
+        // တခြား error — uid ဖြင့် filter မလုပ်ဘဲ ကိုယ့် uid နဲ့ match တာပဲ ပြ
+        getDB().collection('orders')
+          .where('uid', '==', uid)
+          .get()
+          .then(snap => {
+            const orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            renderOrders(orders);
+          })
+          .catch(() => renderOrders([]));
+      }
     });
 }
 
