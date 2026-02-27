@@ -262,8 +262,13 @@ async function placeOrder() {
   const zk       = TOWNSHIP_ZONE[selectedTownship];
   const date     = new Date().toLocaleString('en-GB', { timeZone:'Asia/Yangon' });
 
+  // get uid from localStorage
+  const vzUser = JSON.parse(localStorage.getItem('vz_user') || '{}');
+  const uid    = vzUser.uid || '';
+
   const orderData = {
     orderId,
+    uid,
     name,
     phone,
     address,
