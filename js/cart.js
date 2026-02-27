@@ -3,8 +3,8 @@
 // =============================================
 
 // ── TELEGRAM CONFIG ──
-const TELEGRAM_BOT_TOKEN = '8271893873:AAFW2t-Nr7qoKRoxVo9daYQCG5hBE6rscSs';  // ← ဒီနေရာ token ထည့်
-const TELEGRAM_CHAT_ID   = '-1003844393952';   // ← ဒီနေရာ group id ထည့်
+const TELEGRAM_BOT_TOKEN = 'YOUR_BOT_TOKEN_HERE';  // ← ဒီနေရာ token ထည့်
+const TELEGRAM_CHAT_ID   = 'YOUR_GROUP_ID_HERE';   // ← ဒီနေရာ group id ထည့်
 
 // ── PRODUCTS ──
 const PRODUCTS = {
@@ -127,20 +127,25 @@ function renderCart() {
 }
 
 function renderSummary() {
-  const subtotal = getSubtotal();
-  const total    = subtotal + deliveryFee;
-  const deliveryText = deliveryFee === 0 ? (selectedTownship ? 'FREE' : '—') : deliveryFee.toLocaleString() + ' MMK';
-  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  const subtotal     = getSubtotal();
+  const total        = subtotal + deliveryFee;
+  const deliveryText = deliveryFee > 0
+    ? deliveryFee.toLocaleString() + ' MMK'
+    : (selectedTownship ? 'FREE' : '—');
 
-  // Step 1 summary
-  set('subtotalAmt', subtotal.toLocaleString() + ' MMK');
-  set('deliveryAmt', deliveryText);
-  set('totalAmt',    total.toLocaleString() + ' MMK');
-
-  // Step 2 mini summary
-  set('summarySubtotal', subtotal.toLocaleString() + ' MMK');
-  set('summaryDelivery', deliveryText);
-  set('summaryTotal',    total.toLocaleString() + ' MMK');
+  // update all summary IDs on page
+  const ids = {
+    'subtotalAmt':    subtotal.toLocaleString() + ' MMK',
+    'deliveryAmt':    deliveryText,
+    'totalAmt':       total.toLocaleString() + ' MMK',
+    'summarySubtotal':subtotal.toLocaleString() + ' MMK',
+    'summaryDelivery':deliveryText,
+    'summaryTotal':   total.toLocaleString() + ' MMK',
+  };
+  Object.entries(ids).forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+  });
 }
 
 // ── QTY & REMOVE ──
@@ -219,6 +224,8 @@ function showStep(n) {
     s.classList.toggle('active',    i + 1 === n);
     s.classList.toggle('completed', i + 1 <  n);
   });
+  // Always re-render summary when changing steps
+  renderSummary();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -264,21 +271,28 @@ async function placeOrder() {
     date,
   };
 
-  try {
-    // Firebase Firestore
-    const db = firebase.firestore();
-    await db.collection('orders').add({
-      ...orderData,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-    });
-  } catch(e) {
-    console.warn('Firestore error:', e);
-  }
-
-  // localStorage backup
+  // localStorage backup (always)
   const saved = JSON.parse(localStorage.getItem('vz_orders') || '[]');
   saved.push(orderData);
   localStorage.setItem('vz_orders', JSON.stringify(saved));
+
+  // Firebase Firestore
+  let firestoreOk = false;
+  try {
+    if (typeof firebase !== 'undefined' && firebase.firestore) {
+      const db = firebase.firestore();
+      await db.collection('orders').add({
+        ...orderData,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+      firestoreOk = true;
+      console.log('✓ Firestore saved');
+    } else {
+      console.warn('Firebase not loaded');
+    }
+  } catch(e) {
+    console.error('Firestore error:', e.code, e.message);
+  }
 
   // Telegram notify
   sendTelegram(orderData);
