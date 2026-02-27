@@ -1,10 +1,9 @@
 // =============================================
-// VIBEZEE — Firebase Config
+// VIBEZEE — Firebase Config (Compat Version)
 // =============================================
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+// cart.html / login.html မှာ CDN scripts တွေ
+// ထည့်ထားပြီးသောကြောင့် ဒီ file မှာ
+// initializeApp တစ်ကြိမ်သာ လုပ်ပါ
 
 const firebaseConfig = {
   apiKey:            "AIzaSyBNeNP79jp1mr894citf2V5RHN4UQCCWaU",
@@ -15,6 +14,7 @@ const firebaseConfig = {
   appId:             "1:456545528983:web:8ace5d1c6a49acf68fcdd2"
 };
 
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db   = getFirestore(app);
+// Already initialized check
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
