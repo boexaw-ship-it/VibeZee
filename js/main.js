@@ -45,11 +45,12 @@ function updateNavAuth() {
   if (user) {
     if (navLink) {
       navLink.textContent = user.name || 'PROFILE';
-      navLink.href = '#';
-      navLink.onclick = showLogoutMenu;
+      navLink.href = 'profile.html';
+      navLink.onclick = null;
     }
     if (mobileLink) {
       mobileLink.textContent = user.name || 'PROFILE';
+      mobileLink.href = 'profile.html';
     }
   }
 }
