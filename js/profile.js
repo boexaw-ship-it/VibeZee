@@ -134,6 +134,33 @@ function showOrderDetail(orderJson) {
   const overlay = document.createElement('div');
   overlay.className = 'modal-overlay';
   overlay.id = 'orderModal';
+  // action buttons based on status
+  const status = order.status || 'pending';
+  let actionBtn = '';
+  if (status === 'pending') {
+    actionBtn = `
+      <button onclick="cancelOrder('${order.id}')" style="
+        width:100%;margin-top:1.2rem;
+        background:transparent;border:1px solid rgba(255,82,82,0.4);
+        border-radius:10px;padding:0.9rem;color:#ff5252;
+        font-family:var(--font-display);font-size:0.78rem;
+        font-weight:700;letter-spacing:1px;cursor:pointer;
+        transition:background 0.2s;">
+        ❌ CANCEL ORDER
+      </button>`;
+  } else if (status === 'delivered') {
+    actionBtn = `
+      <button onclick="deleteOrder('${order.id}')" style="
+        width:100%;margin-top:1.2rem;
+        background:transparent;border:1px solid rgba(255,82,82,0.3);
+        border-radius:10px;padding:0.9rem;color:#ff5252;
+        font-family:var(--font-display);font-size:0.78rem;
+        font-weight:700;letter-spacing:1px;cursor:pointer;
+        transition:background 0.2s;">
+        🗑 DELETE ORDER
+      </button>`;
+  }
+
   overlay.innerHTML = `
     <div class="modal">
       <div class="modal-header">
@@ -142,9 +169,9 @@ function showOrderDetail(orderJson) {
       </div>
 
       <div style="text-align:center;margin-bottom:1.2rem;">
-        <span class="status-badge status-${order.status || 'pending'}"
+        <span class="status-badge status-${status}"
               style="font-size:0.8rem;padding:0.5rem 1.4rem;">
-          ${statusLabel(order.status)}
+          ${statusLabel(status)}
         </span>
       </div>
 
@@ -197,6 +224,8 @@ function showOrderDetail(orderJson) {
         </div>
         <div class="modal-total-val">${(order.total||0).toLocaleString()} MMK</div>
       </div>
+
+      ${actionBtn}
     </div>`;
 
   document.body.appendChild(overlay);
@@ -208,6 +237,83 @@ function closeOrderModal() {
   document.getElementById('orderModal')?.remove();
 }
 window.closeOrderModal = closeOrderModal;
+
+// ── CANCEL PENDING ORDER ──
+function cancelOrder(id) {
+  if (!id) return;
+  vzConfirm('❌', 'CANCEL ORDER', 'Order ကို cancel လုပ်မှာ သေချာပါသလား?', 'CANCEL ORDER', async () => {
+    try {
+      await getDB().collection('orders').doc(id).update({ status: 'cancelled' });
+      closeOrderModal();
+      showToast('Order cancelled ✓');
+    } catch(e) {
+      console.error(e);
+      showToast('Error: ' + e.message);
+    }
+  });
+}
+window.cancelOrder = cancelOrder;
+
+// ── DELETE DELIVERED ORDER ──
+function deleteOrder(id) {
+  if (!id) return;
+  vzConfirm('🗑️', 'DELETE ORDER', 'Order history ကနေ ဖျက်မှာ သေချာပါသလား?', 'DELETE', async () => {
+    try {
+      await getDB().collection('orders').doc(id).delete();
+      closeOrderModal();
+      showToast('Order deleted ✓');
+    } catch(e) {
+      console.error(e);
+      showToast('Error: ' + e.message);
+    }
+  });
+}
+window.deleteOrder = deleteOrder;
+
+// ── CUSTOM CONFIRM ──
+function vzConfirm(icon, title, msg, confirmText, onConfirm) {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.style.zIndex = '300';
+  overlay.innerHTML = `
+    <div class="modal" style="max-width:320px;text-align:center;">
+      <div style="font-size:2.5rem;margin-bottom:1rem;">${icon}</div>
+      <div style="font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--white);margin-bottom:0.5rem;">${title}</div>
+      <div style="font-size:0.95rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.5;">${msg}</div>
+      <div style="display:flex;gap:0.8rem;">
+        <button id="vzNo"  style="flex:1;background:transparent;border:1px solid var(--border);border-radius:8px;padding:0.85rem;color:var(--gray);font-family:var(--font-display);font-size:0.75rem;font-weight:600;letter-spacing:1px;cursor:pointer;">BACK</button>
+        <button id="vzYes" style="flex:1;background:#ff5252;border:none;border-radius:8px;padding:0.85rem;color:#fff;font-family:var(--font-display);font-size:0.75rem;font-weight:700;letter-spacing:1px;cursor:pointer;">${confirmText}</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#vzNo').onclick  = () => overlay.remove();
+  overlay.querySelector('#vzYes').onclick = () => { overlay.remove(); onConfirm(); };
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  const existing = document.getElementById('profileToast');
+  if (existing) existing.remove();
+  const t = document.createElement('div');
+  t.id = 'profileToast';
+  t.textContent = msg;
+  t.style.cssText = `
+    position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(80px);
+    background:var(--card);border:1px solid var(--green);color:var(--green);
+    font-family:var(--font-display);font-size:0.8rem;font-weight:600;letter-spacing:1px;
+    padding:0.8rem 1.5rem;border-radius:10px;z-index:999;
+    transition:transform 0.3s,opacity 0.3s;opacity:0;`;
+  document.body.appendChild(t);
+  requestAnimationFrame(() => {
+    t.style.transform = 'translateX(-50%) translateY(0)';
+    t.style.opacity   = '1';
+  });
+  setTimeout(() => {
+    t.style.transform = 'translateX(-50%) translateY(80px)';
+    t.style.opacity   = '0';
+    setTimeout(() => t.remove(), 300);
+  }, 2500);
+}
 
 // ── LOGOUT ──
 function logoutUser() {
