@@ -1,350 +1,245 @@
 // =============================================
-// VIBEZEE — Profile JS (Real-time Firestore)
+// VIBEZEE — Profile JS (Simple + Clean)
 // =============================================
 
-let _db         = null;
-let _unsubscribe = null; // real-time listener cleanup
+let _db          = null;
+let _unsubscribe = null;
 
 function getDB() {
   if (!_db) _db = firebase.firestore();
   return _db;
 }
 
-// ── LOAD USER ──
-function loadUser() {
-  const user = JSON.parse(localStorage.getItem('vz_user') || 'null');
-  if (!user) { window.location.href = 'login.html'; return null; }
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', function() {
+  _db = firebase.firestore();
 
+  const user = JSON.parse(localStorage.getItem('vz_user') || 'null');
+  if (!user) { window.location.href = 'login.html'; return; }
+
+  // show name initial
   const el = id => document.getElementById(id);
+  if (el('profileInitial')) el('profileInitial').textContent = (user.name||'U').charAt(0).toUpperCase();
   if (el('profileName'))    el('profileName').textContent    = user.name  || 'User';
   if (el('profileEmail'))   el('profileEmail').textContent   = user.email || '';
-  if (el('profileInitial')) el('profileInitial').textContent = (user.name || 'U').charAt(0).toUpperCase();
-  return user;
-}
 
-// ── REAL-TIME ORDERS LISTENER ──
+  // cart count
+  const cart = JSON.parse(localStorage.getItem('vz_cart')||'[]');
+  document.querySelectorAll('.cart-count').forEach(e => e.textContent = cart.length);
+
+  // load orders
+  listenOrders(user.uid || '');
+
+  window.addEventListener('beforeunload', () => { if (_unsubscribe) _unsubscribe(); });
+});
+
+// ── REAL-TIME ORDERS ──
 function listenOrders(uid) {
   const wrap = document.getElementById('ordersList');
   if (!wrap) return;
+  wrap.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--gray);">⚙️ Loading...</div>';
 
-  wrap.innerHTML = `
-    <div class="loading-wrap">
-      <span class="loading-spinner">⚙️</span>
-      Loading orders...
-    </div>`;
-
-  const db = getDB();
-
-  // unsubscribe previous listener
   if (_unsubscribe) _unsubscribe();
 
-  // real-time listener by uid
-  _unsubscribe = db.collection('orders')
+  _unsubscribe = getDB().collection('orders')
     .where('uid', '==', uid)
     .orderBy('createdAt', 'desc')
-    .onSnapshot(
-      snap => {
-        let orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-        // fallback: if no orders by uid, try localStorage
-        if (orders.length === 0) {
-          const local = JSON.parse(localStorage.getItem('vz_orders') || '[]');
-          orders = local.reverse();
-        }
-        renderOrders(orders);
-      },
-      err => {
-        console.error('Firestore listener error:', err);
-        // fallback localStorage
-        const local = JSON.parse(localStorage.getItem('vz_orders') || '[]');
-        renderOrders(local.reverse());
-      }
-    );
+    .onSnapshot(snap => {
+      const orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderOrders(orders);
+    }, err => {
+      console.error(err);
+      // fallback localStorage
+      const local = JSON.parse(localStorage.getItem('vz_orders')||'[]');
+      renderOrders(local.reverse());
+    });
 }
 
-// ── RENDER ORDERS ──
+// ── RENDER ORDER CARDS ──
 function renderOrders(orders) {
   const wrap  = document.getElementById('ordersList');
   const count = document.getElementById('ordersCount');
   if (!wrap) return;
   if (count) count.textContent = orders.length;
 
-  if (orders.length === 0) {
+  if (!orders.length) {
     wrap.innerHTML = `
-      <div class="orders-empty">
-        <div class="orders-empty-icon">🛒</div>
-        <div class="orders-empty-title">NO ORDERS YET</div>
-        <p class="orders-empty-sub">မှာယူမှု မရှိသေးဘူး</p>
+      <div style="text-align:center;padding:4rem 2rem;background:var(--card);border:1px solid var(--border);border-radius:14px;">
+        <div style="font-size:3rem;margin-bottom:1rem;">🛒</div>
+        <div style="font-family:var(--font-display);font-size:1rem;color:var(--white);letter-spacing:2px;margin-bottom:0.5rem;">NO ORDERS YET</div>
+        <p style="color:var(--gray);margin-bottom:1.5rem;">မှာယူမှု မရှိသေးဘူး</p>
         <a href="shop.html" class="btn-primary">SHOP NOW →</a>
       </div>`;
     return;
   }
 
-  wrap.innerHTML = orders.map(order => {
-    const preview = (order.items || [])
-      .map(i => i.icon + ' ' + i.name)
-      .slice(0, 2)
-      .join(', ')
-      + (order.items?.length > 2 ? ' +' + (order.items.length - 2) + ' more' : '');
-
-    const orderJson = encodeURIComponent(JSON.stringify(order));
+  wrap.innerHTML = orders.map(o => {
+    const preview = (o.items||[]).slice(0,2).map(i => i.icon+' '+i.name).join(', ')
+      + (o.items?.length > 2 ? ' +' + (o.items.length-2) + ' more' : '');
+    const encoded = encodeURIComponent(JSON.stringify(o));
+    const canCancel = o.status === 'pending' || !o.status;
+    const canDelete = o.status === 'delivered' || o.status === 'cancelled';
 
     return `
-      <div class="order-card" onclick="showOrderDetail('${orderJson}')">
-        <div class="order-card-left">
-          <div class="order-id">${order.orderId || '—'}</div>
-          <div class="order-date">📅 ${order.date || '—'}</div>
-          <div class="order-items-preview">${preview}</div>
+      <div class="order-card">
+        <div class="order-card-body" onclick="showModal('${encoded}')" style="flex:1;cursor:pointer;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+            <div>
+              <div class="order-id">${o.orderId||'—'}</div>
+              <div class="order-date">📅 ${o.date||'—'}</div>
+              <div class="order-items-preview">${preview}</div>
+            </div>
+            <div style="text-align:right;">
+              <div class="order-total">${(o.total||0).toLocaleString()} MMK</div>
+              <span class="status-badge status-${o.status||'pending'}">${statusLabel(o.status)}</span>
+            </div>
+          </div>
         </div>
-        <div class="order-card-right">
-          <div class="order-total">${(order.total || 0).toLocaleString()} MMK</div>
-          <span class="status-badge status-${order.status || 'pending'}">
-            ${statusLabel(order.status)}
-          </span>
-          <span class="order-card-arrow">→</span>
+        <div style="display:flex;flex-direction:column;gap:0.4rem;margin-left:0.5rem;">
+          ${canCancel ? `<button class="card-action-btn cancel-btn" onclick="cancelOrder('${o.id}')">❌</button>` : ''}
+          ${canDelete ? `<button class="card-action-btn delete-btn" onclick="deleteOrder('${o.id}')">🗑</button>` : ''}
         </div>
       </div>`;
   }).join('');
 }
 
-// ── STATUS LABEL ──
+// ── STATUS ──
 function statusLabel(s) {
-  const map = {
-    pending:   '⏳ PENDING',
-    confirmed: '✅ CONFIRMED',
-    delivered: '📦 DELIVERED',
-    cancelled: '❌ CANCELLED',
-  };
-  return map[s] || '⏳ PENDING';
+  return { pending:'⏳ PENDING', confirmed:'✅ CONFIRMED', delivered:'📦 DELIVERED', cancelled:'❌ CANCELLED' }[s] || '⏳ PENDING';
 }
 
-// ── ORDER DETAIL MODAL ──
-function showOrderDetail(orderJson) {
-  const order = JSON.parse(decodeURIComponent(orderJson));
-  const pl    = { cod:'🚚 Cash on Delivery', kbzpay:'📱 KBZPay', wavepay:'💜 WavePay' };
-
-  const items = (order.items || []).map(i => `
-    <div class="modal-item-row">
-      <div class="modal-item-icon">${i.icon || '📦'}</div>
-      <div class="modal-item-name">${i.name}</div>
-      <div class="modal-item-qty">x${i.qty}</div>
-      <div class="modal-item-price">${(i.price * i.qty).toLocaleString()} MMK</div>
-    </div>`).join('');
-
-  const overlay = document.createElement('div');
-  overlay.className = 'modal-overlay';
-  overlay.id = 'orderModal';
-  // action buttons based on status
-  const status = order.status || 'pending';
-  let actionBtn = '';
-  if (status === 'pending') {
-    actionBtn = `
-      <button onclick="cancelOrder('${order.id}')" style="
-        width:100%;margin-top:1.2rem;
-        background:transparent;border:1px solid rgba(255,82,82,0.4);
-        border-radius:10px;padding:0.9rem;color:#ff5252;
-        font-family:var(--font-display);font-size:0.78rem;
-        font-weight:700;letter-spacing:1px;cursor:pointer;
-        transition:background 0.2s;">
-        ❌ CANCEL ORDER
-      </button>`;
-  } else if (status === 'delivered') {
-    actionBtn = `
-      <button onclick="deleteOrder('${order.id}')" style="
-        width:100%;margin-top:1.2rem;
-        background:transparent;border:1px solid rgba(255,82,82,0.3);
-        border-radius:10px;padding:0.9rem;color:#ff5252;
-        font-family:var(--font-display);font-size:0.78rem;
-        font-weight:700;letter-spacing:1px;cursor:pointer;
-        transition:background 0.2s;">
-        🗑 DELETE ORDER
-      </button>`;
-  }
-
-  overlay.innerHTML = `
-    <div class="modal">
-      <div class="modal-header">
-        <div class="modal-title">ORDER DETAILS</div>
-        <button class="modal-close" onclick="closeOrderModal()">✕</button>
-      </div>
-
-      <div style="text-align:center;margin-bottom:1.2rem;">
-        <span class="status-badge status-${status}"
-              style="font-size:0.8rem;padding:0.5rem 1.4rem;">
-          ${statusLabel(status)}
-        </span>
-      </div>
-
-      <div class="detail-section-title">ORDER INFO</div>
-      <div class="detail-row">
-        <span class="detail-key">Order ID</span>
-        <span class="detail-val" style="color:var(--green);">${order.orderId || '—'}</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-key">Date</span>
-        <span class="detail-val">${order.date || '—'}</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-key">Payment</span>
-        <span class="detail-val">${pl[order.payment] || order.payment || '—'}</span>
-      </div>
-
-      <div class="detail-section-title">DELIVERY INFO</div>
-      <div class="detail-row">
-        <span class="detail-key">Name</span>
-        <span class="detail-val">${order.name || '—'}</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-key">Phone</span>
-        <span class="detail-val">${order.phone || '—'}</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-key">Township</span>
-        <span class="detail-val">${order.township || '—'}</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-key">Address</span>
-        <span class="detail-val">${order.address || '—'}</span>
-      </div>
-      ${order.note ? `
-      <div class="detail-row">
-        <span class="detail-key">Note</span>
-        <span class="detail-val">${order.note}</span>
-      </div>` : ''}
-
-      <div class="detail-section-title">ITEMS</div>
-      ${items}
-
-      <div class="modal-total-row">
-        <div>
-          <div class="modal-total-label">TOTAL</div>
-          <div style="font-size:0.85rem;color:var(--gray);margin-top:0.2rem;">
-            Subtotal ${(order.subtotal||0).toLocaleString()} + Delivery ${(order.deliveryFee||0).toLocaleString()} MMK
-          </div>
-        </div>
-        <div class="modal-total-val">${(order.total||0).toLocaleString()} MMK</div>
-      </div>
-
-      ${actionBtn}
-    </div>`;
-
-  document.body.appendChild(overlay);
-  overlay.addEventListener('click', e => { if (e.target === overlay) closeOrderModal(); });
-}
-window.showOrderDetail = showOrderDetail;
-
-function closeOrderModal() {
-  document.getElementById('orderModal')?.remove();
-}
-window.closeOrderModal = closeOrderModal;
-
-// ── CANCEL PENDING ORDER ──
+// ── CANCEL ORDER ──
 function cancelOrder(id) {
-  if (!id) return;
-  vzConfirm('❌', 'CANCEL ORDER', 'Order ကို cancel လုပ်မှာ သေချာပါသလား?', 'CANCEL ORDER', async () => {
+  vzConfirm('❌', 'CANCEL ORDER', 'Order ကို cancel လုပ်မှာ သေချာပါသလား?', 'YES, CANCEL', async () => {
     try {
       await getDB().collection('orders').doc(id).update({ status: 'cancelled' });
-      closeOrderModal();
-      showToast('Order cancelled ✓');
+      showToast('✓ Order cancelled');
     } catch(e) {
       console.error(e);
-      showToast('Error: ' + e.message);
+      showToast('Error: ' + (e.message||'failed'));
     }
   });
 }
 window.cancelOrder = cancelOrder;
 
-// ── DELETE DELIVERED ORDER ──
+// ── DELETE ORDER ──
 function deleteOrder(id) {
-  if (!id) return;
-  vzConfirm('🗑️', 'DELETE ORDER', 'Order history ကနေ ဖျက်မှာ သေချာပါသလား?', 'DELETE', async () => {
+  vzConfirm('🗑️', 'DELETE ORDER', 'History ကနေ ဖျက်မှာ သေချာပါသလား?', 'DELETE', async () => {
     try {
       await getDB().collection('orders').doc(id).delete();
-      closeOrderModal();
-      showToast('Order deleted ✓');
+      showToast('✓ Order deleted');
     } catch(e) {
       console.error(e);
-      showToast('Error: ' + e.message);
+      showToast('Error: ' + (e.message||'failed'));
     }
   });
 }
 window.deleteOrder = deleteOrder;
 
-// ── CUSTOM CONFIRM ──
-function vzConfirm(icon, title, msg, confirmText, onConfirm) {
+// ── ORDER DETAIL MODAL ──
+function showModal(encoded) {
+  const o  = JSON.parse(decodeURIComponent(encoded));
+  const pl = { cod:'🚚 Cash on Delivery', kbzpay:'📱 KBZPay', wavepay:'💜 WavePay' };
+
+  const items = (o.items||[]).map(i => `
+    <div style="display:flex;align-items:center;gap:0.8rem;padding:0.7rem 0;border-bottom:1px solid rgba(0,230,118,0.06);">
+      <span style="font-size:1.4rem;">${i.icon||'📦'}</span>
+      <span style="flex:1;font-size:0.9rem;color:var(--white);">${i.name}</span>
+      <span style="font-size:0.85rem;color:var(--gray);">x${i.qty}</span>
+      <span style="font-family:var(--font-display);font-size:0.85rem;font-weight:700;color:var(--green);">${(i.price*i.qty).toLocaleString()} MMK</span>
+    </div>`).join('');
+
+  const row = (k,v) => `
+    <div style="display:flex;justify-content:space-between;padding:0.6rem 0;border-bottom:1px solid rgba(0,230,118,0.06);font-size:0.95rem;">
+      <span style="color:var(--gray);">${k}</span>
+      <span style="color:var(--white);font-weight:600;text-align:right;">${v}</span>
+    </div>`;
+
   const overlay = document.createElement('div');
-  overlay.className = 'modal-overlay';
-  overlay.style.zIndex = '300';
+  overlay.id = 'orderModal';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.78);backdrop-filter:blur(5px);z-index:200;display:flex;align-items:center;justify-content:center;padding:1.5rem;animation:fadeIn 0.2s ease;';
+
   overlay.innerHTML = `
-    <div class="modal" style="max-width:320px;text-align:center;">
-      <div style="font-size:2.5rem;margin-bottom:1rem;">${icon}</div>
-      <div style="font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--white);margin-bottom:0.5rem;">${title}</div>
-      <div style="font-size:0.95rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.5;">${msg}</div>
-      <div style="display:flex;gap:0.8rem;">
-        <button id="vzNo"  style="flex:1;background:transparent;border:1px solid var(--border);border-radius:8px;padding:0.85rem;color:var(--gray);font-family:var(--font-display);font-size:0.75rem;font-weight:600;letter-spacing:1px;cursor:pointer;">BACK</button>
-        <button id="vzYes" style="flex:1;background:#ff5252;border:none;border-radius:8px;padding:0.85rem;color:#fff;font-family:var(--font-display);font-size:0.75rem;font-weight:700;letter-spacing:1px;cursor:pointer;">${confirmText}</button>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:2rem;width:100%;max-width:460px;max-height:88vh;overflow-y:auto;animation:slideUp 0.25s ease;box-shadow:0 24px 64px rgba(0,0,0,0.5);">
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;padding-bottom:1rem;border-bottom:1px solid var(--border);">
+        <span style="font-family:var(--font-display);font-size:0.85rem;font-weight:700;letter-spacing:2px;color:var(--green);">ORDER DETAILS</span>
+        <button onclick="closeModal()" style="background:transparent;border:none;color:var(--gray);font-size:1.3rem;cursor:pointer;padding:4px 8px;border-radius:6px;">✕</button>
+      </div>
+
+      <div style="text-align:center;margin-bottom:1.2rem;">
+        <span class="status-badge status-${o.status||'pending'}" style="font-size:0.8rem;padding:0.5rem 1.4rem;">${statusLabel(o.status)}</span>
+      </div>
+
+      <div style="font-family:var(--font-display);font-size:0.65rem;font-weight:700;letter-spacing:2px;color:var(--gray);margin:1rem 0 0.5rem;">ORDER INFO</div>
+      ${row('Order ID','<span style="color:var(--green);">'+( o.orderId||'—')+'</span>')}
+      ${row('Date', o.date||'—')}
+      ${row('Payment', pl[o.payment]||o.payment||'—')}
+
+      <div style="font-family:var(--font-display);font-size:0.65rem;font-weight:700;letter-spacing:2px;color:var(--gray);margin:1rem 0 0.5rem;">DELIVERY</div>
+      ${row('Name', o.name||'—')}
+      ${row('Phone', o.phone||'—')}
+      ${row('Township', o.township||'—')}
+      ${row('Address', o.address||'—')}
+      ${o.note ? row('Note', o.note) : ''}
+
+      <div style="font-family:var(--font-display);font-size:0.65rem;font-weight:700;letter-spacing:2px;color:var(--gray);margin:1rem 0 0.5rem;">ITEMS</div>
+      ${items}
+
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:1rem 0 0;margin-top:0.5rem;border-top:1px solid var(--border);">
+        <div>
+          <div style="font-family:var(--font-display);font-size:0.85rem;font-weight:700;color:var(--white);">TOTAL</div>
+          <div style="font-size:0.82rem;color:var(--gray);margin-top:0.2rem;">Subtotal ${(o.subtotal||0).toLocaleString()} + Delivery ${(o.deliveryFee||0).toLocaleString()} MMK</div>
+        </div>
+        <div style="font-family:var(--font-display);font-size:1.2rem;font-weight:900;color:var(--green);">${(o.total||0).toLocaleString()} MMK</div>
       </div>
     </div>`;
-  document.body.appendChild(overlay);
-  overlay.querySelector('#vzNo').onclick  = () => overlay.remove();
-  overlay.querySelector('#vzYes').onclick = () => { overlay.remove(); onConfirm(); };
-}
 
-// ── TOAST ──
-function showToast(msg) {
-  const existing = document.getElementById('profileToast');
-  if (existing) existing.remove();
-  const t = document.createElement('div');
-  t.id = 'profileToast';
-  t.textContent = msg;
-  t.style.cssText = `
-    position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(80px);
-    background:var(--card);border:1px solid var(--green);color:var(--green);
-    font-family:var(--font-display);font-size:0.8rem;font-weight:600;letter-spacing:1px;
-    padding:0.8rem 1.5rem;border-radius:10px;z-index:999;
-    transition:transform 0.3s,opacity 0.3s;opacity:0;`;
-  document.body.appendChild(t);
-  requestAnimationFrame(() => {
-    t.style.transform = 'translateX(-50%) translateY(0)';
-    t.style.opacity   = '1';
-  });
-  setTimeout(() => {
-    t.style.transform = 'translateX(-50%) translateY(80px)';
-    t.style.opacity   = '0';
-    setTimeout(() => t.remove(), 300);
-  }, 2500);
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
 }
+window.showModal = showModal;
+
+function closeModal() { document.getElementById('orderModal')?.remove(); }
+window.closeModal = closeModal;
 
 // ── LOGOUT ──
 function logoutUser() {
-  if (_unsubscribe) _unsubscribe(); // stop listener
+  if (_unsubscribe) _unsubscribe();
   localStorage.removeItem('vz_user');
   localStorage.removeItem('vz_token');
   window.location.href = 'login.html';
 }
 window.logoutUser = logoutUser;
 
-// ── INIT ──
-document.addEventListener('DOMContentLoaded', function() {
-  _db = firebase.firestore();
-  const user = loadUser();
-  if (!user) return;
+// ── CONFIRM DIALOG ──
+function vzConfirm(icon, title, msg, confirmText, onConfirm) {
+  const o = document.createElement('div');
+  o.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(4px);z-index:300;display:flex;align-items:center;justify-content:center;padding:1.5rem;';
+  o.innerHTML = `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:2rem;max-width:300px;width:100%;text-align:center;box-shadow:0 24px 48px rgba(0,0,0,0.5);">
+      <div style="font-size:2.5rem;margin-bottom:0.8rem;">${icon}</div>
+      <div style="font-family:var(--font-display);font-size:0.95rem;font-weight:700;color:var(--white);margin-bottom:0.5rem;">${title}</div>
+      <div style="font-size:0.9rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.5;">${msg}</div>
+      <div style="display:flex;gap:0.8rem;">
+        <button id="vNo"  style="flex:1;background:transparent;border:1px solid var(--border);border-radius:8px;padding:0.8rem;color:var(--gray);font-family:var(--font-display);font-size:0.72rem;font-weight:600;letter-spacing:1px;cursor:pointer;">BACK</button>
+        <button id="vYes" style="flex:1;background:#ff5252;border:none;border-radius:8px;padding:0.8rem;color:#fff;font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:1px;cursor:pointer;">${confirmText}</button>
+      </div>
+    </div>`;
+  document.body.appendChild(o);
+  o.querySelector('#vNo').onclick  = () => o.remove();
+  o.querySelector('#vYes').onclick = () => { o.remove(); onConfirm(); };
+}
 
-  // cart count
-  const cart = JSON.parse(localStorage.getItem('vz_cart') || '[]');
-  document.querySelectorAll('.cart-count').forEach(el => el.textContent = cart.length);
-
-  // start real-time listener
-  if (user.uid) {
-    listenOrders(user.uid);
-  } else {
-    // no uid — fallback localStorage
-    const local = JSON.parse(localStorage.getItem('vz_orders') || '[]');
-    renderOrders(local.reverse());
-  }
-
-  // cleanup on leave
-  window.addEventListener('beforeunload', () => {
-    if (_unsubscribe) _unsubscribe();
-  });
-});
+// ── TOAST ──
+function showToast(msg) {
+  const ex = document.getElementById('pToast');
+  if (ex) ex.remove();
+  const t = document.createElement('div');
+  t.id = 'pToast';
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);border:1px solid var(--green);color:var(--green);font-family:var(--font-display);font-size:0.8rem;font-weight:600;letter-spacing:1px;padding:0.8rem 1.5rem;border-radius:10px;z-index:999;transition:transform 0.3s,opacity 0.3s;opacity:0;white-space:nowrap;';
+  document.body.appendChild(t);
+  requestAnimationFrame(() => { t.style.transform='translateX(-50%) translateY(0)'; t.style.opacity='1'; });
+  setTimeout(() => { t.style.transform='translateX(-50%) translateY(80px)'; t.style.opacity='0'; setTimeout(()=>t.remove(),300); }, 2500);
+}
