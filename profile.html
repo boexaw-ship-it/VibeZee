@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profile — VibeZee</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/profile.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html">HOME</a>
+    <a href="shop.html">SHOP</a>
+    <a href="cart.html">CART</a>
+    <a href="profile.html" class="active">PROFILE</a>
+  </div>
+
+  <!-- NAV -->
+  <nav class="navbar">
+    <div class="nav-logo" onclick="location.href='index.html'">
+      <span class="logo-vibe">VIBE</span><span class="logo-zee">ZEE</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html">HOME</a></li>
+      <li><a href="shop.html">SHOP</a></li>
+      <li><a href="cart.html">CART <span class="cart-badge cart-count">0</span></a></li>
+      <li><a href="profile.html" class="btn-nav active">PROFILE</a></li>
+    </ul>
+    <div class="nav-hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+
+  <!-- PROFILE PAGE -->
+  <div class="profile-page">
+
+    <!-- Profile Card -->
+    <div class="profile-card">
+      <div class="profile-avatar">
+        <span id="profileInitial">U</span>
+      </div>
+      <div>
+        <div class="profile-name"  id="profileName">Loading...</div>
+        <div class="profile-email" id="profileEmail"></div>
+      </div>
+      <div class="profile-badge">CUSTOMER</div>
+    </div>
+
+    <!-- Quick actions -->
+    <div style="display:flex;gap:1rem;margin-bottom:2rem;flex-wrap:wrap;">
+      <a href="shop.html" class="btn-ghost" style="flex:1;justify-content:center;min-width:120px;">🛍 SHOP</a>
+      <a href="cart.html" class="btn-ghost" style="flex:1;justify-content:center;min-width:120px;">🛒 CART</a>
+      <button onclick="logoutUser()" style="flex:1;min-width:120px;background:transparent;border:1px solid rgba(255,82,82,0.3);border-radius:8px;padding:1rem;color:#ff5252;font-family:var(--font-display);font-size:0.75rem;font-weight:700;letter-spacing:1px;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,82,82,0.08)'" onmouseout="this.style.background='transparent'">
+        🚪 LOGOUT
+      </button>
+    </div>
+
+    <!-- Order History -->
+    <div class="section-head">
+      <div class="section-head-title">// ORDER HISTORY</div>
+      <div class="orders-count">Total: <strong id="ordersCount">0</strong> orders</div>
+    </div>
+
+    <div class="orders-list" id="ordersList">
+      <div class="loading-wrap">
+        <span class="loading-spinner">⚙️</span>
+        Loading...
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Firebase CDN -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script>
+    firebase.initializeApp({
+      apiKey:            "AIzaSyBNeNP79jp1mr894citf2V5RHN4UQCCWaU",
+      authDomain:        "vibezee-845ba.firebaseapp.com",
+      projectId:         "vibezee-845ba",
+      storageBucket:     "vibezee-845ba.firebasestorage.app",
+      messagingSenderId: "456545528983",
+      appId:             "1:456545528983:web:8ace5d1c6a49acf68fcdd2"
+    });
+  </script>
+  <script src="js/main.js"></script>
+  <script src="js/profile.js"></script>
+</body>
+</html>
