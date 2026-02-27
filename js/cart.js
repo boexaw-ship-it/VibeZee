@@ -3,8 +3,8 @@
 // =============================================
 
 // ── TELEGRAM CONFIG ──
-const TELEGRAM_BOT_TOKEN = 'YOUR_BOT_TOKEN_HERE';  // ← ဒီနေရာ token ထည့်
-const TELEGRAM_CHAT_ID   = 'YOUR_GROUP_ID_HERE';   // ← ဒီနေရာ group id ထည့်
+const TELEGRAM_BOT_TOKEN = 'YOUR_BOT_TOKEN_HERE';
+const TELEGRAM_CHAT_ID   = 'YOUR_GROUP_ID_HERE';
 
 // ── PRODUCTS ──
 const PRODUCTS = {
@@ -65,10 +65,19 @@ const TOWNSHIP_ZONE = {};
 Object.entries(DELIVERY_ZONES).forEach(([k,z]) => z.townships.forEach(t => TOWNSHIP_ZONE[t] = k));
 
 // ── STATE ──
-let cart             = JSON.parse(localStorage.getItem('vz_cart') || '[]').map(Number);
-let selectedPayment  = 'cod';
-let selectedTownship = '';
-let deliveryFee      = 0;
+let cart            = JSON.parse(localStorage.getItem('vz_cart') || '[]').map(Number);
+let selectedPayment = 'cod';
+let selectedTownship= '';
+let deliveryFee     = 0;
+
+// ── FIREBASE DB (set after DOMContentLoaded) ──
+let _db = null;
+function getDB() {
+  if (!_db) {
+    _db = firebase.firestore();
+  }
+  return _db;
+}
 
 function saveCart() {
   localStorage.setItem('vz_cart', JSON.stringify(cart));
@@ -93,19 +102,15 @@ function renderCart() {
   const items   = getCartItems();
   const wrap    = document.getElementById('cartItems');
   const empty   = document.getElementById('cartEmpty');
-  const counter = document.getElementById('cartItemCount');
   if (!wrap) return;
 
   if (items.length === 0) {
     wrap.innerHTML = '';
-    if (empty)   { empty.classList.add('show'); }
-    if (counter) counter.textContent = '0 items';
+    if (empty) empty.classList.add('show');
     renderSummary();
     return;
   }
-
-  if (empty)   empty.classList.remove('show');
-  if (counter) counter.textContent = items.length + (items.length > 1 ? ' items' : ' item');
+  if (empty) empty.classList.remove('show');
 
   wrap.innerHTML = items.map(item => `
     <div class="cart-item">
@@ -133,14 +138,13 @@ function renderSummary() {
     ? deliveryFee.toLocaleString() + ' MMK'
     : (selectedTownship ? 'FREE' : '—');
 
-  // update all summary IDs on page
   const ids = {
-    'subtotalAmt':    subtotal.toLocaleString() + ' MMK',
-    'deliveryAmt':    deliveryText,
-    'totalAmt':       total.toLocaleString() + ' MMK',
-    'summarySubtotal':subtotal.toLocaleString() + ' MMK',
-    'summaryDelivery':deliveryText,
-    'summaryTotal':   total.toLocaleString() + ' MMK',
+    'subtotalAmt':     subtotal.toLocaleString()  + ' MMK',
+    'deliveryAmt':     deliveryText,
+    'totalAmt':        total.toLocaleString()     + ' MMK',
+    'summarySubtotal': subtotal.toLocaleString()  + ' MMK',
+    'summaryDelivery': deliveryText,
+    'summaryTotal':    total.toLocaleString()     + ' MMK',
   };
   Object.entries(ids).forEach(([id, val]) => {
     const el = document.getElementById(id);
@@ -167,21 +171,21 @@ function removeItem(id) {
 window.removeItem = removeItem;
 
 function clearCart() {
-  vzConfirm('🗑️', 'CLEAR CART', 'Cart ထဲက ပစ္စည်းအကုန် ဖျက်မှာ သေချာပါသလား?', 'CLEAR ALL', () => {
+  vzConfirm('🗑️','CLEAR CART','Cart ထဲက ပစ္စည်းအကုန် ဖျက်မှာ သေချာပါသလား?','CLEAR ALL', () => {
     cart = []; saveCart(); renderCart();
-    showToast('🗑 Cart ကို ရှင်းလင်းပြီးပါပြီ');
+    showToast('🗑 Cart ရှင်းလင်းပြီးပါပြီ');
   });
 }
 window.clearCart = clearCart;
 
-// ── TOWNSHIP DROPDOWN ──
+// ── TOWNSHIP ──
 function buildTownshipDropdown() {
   const select = document.getElementById('checkTownship');
   if (!select) return;
   select.innerHTML = '<option value="">-- မြို့နယ် ရွေးပါ --</option>';
   Object.entries(DELIVERY_ZONES).forEach(([key, z]) => {
     const group = document.createElement('optgroup');
-    group.label = z.label + ' — ' + z.fee.toLocaleString() + ' MMK';
+    group.label = z.label + '  —  ' + z.fee.toLocaleString() + ' MMK';
     z.townships.forEach(t => {
       const opt = document.createElement('option');
       opt.value = t; opt.textContent = t;
@@ -217,16 +221,15 @@ window.selectPayment = selectPayment;
 
 // ── STEPS ──
 function showStep(n) {
-  document.querySelectorAll('.checkout-step').forEach((s, i) => {
-    s.classList.toggle('active', i + 1 === n);
+  document.querySelectorAll('.checkout-step').forEach((s,i) => {
+    s.classList.toggle('active', i+1 === n);
   });
-  document.querySelectorAll('.step-item').forEach((s, i) => {
-    s.classList.toggle('active',    i + 1 === n);
-    s.classList.toggle('completed', i + 1 <  n);
+  document.querySelectorAll('.step-item').forEach((s,i) => {
+    s.classList.toggle('active',    i+1 === n);
+    s.classList.toggle('completed', i+1 <  n);
   });
-  // Always re-render summary when changing steps
   renderSummary();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo({ top:0, behavior:'smooth' });
 }
 
 function goToCheckout() {
@@ -246,7 +249,7 @@ async function placeOrder() {
   const address = document.getElementById('checkAddress')?.value.trim();
   const note    = document.getElementById('checkNote')?.value.trim();
 
-  if (!name || !phone || !address) { showToast('⚠ နာမည်၊ ဖုန်းနံပါတ်၊ လိပ်စာ ဖြည့်ပါ'); return; }
+  if (!name || !phone || !address) { showToast('⚠ နာမည်၊ ဖုန်း၊ လိပ်စာ ဖြည့်ပါ'); return; }
   if (!selectedTownship)           { showToast('⚠ မြို့နယ် ရွေးပါ'); return; }
 
   const btn = document.getElementById('btnPlaceOrder');
@@ -255,59 +258,67 @@ async function placeOrder() {
   const items    = getCartItems();
   const subtotal = getSubtotal();
   const total    = subtotal + deliveryFee;
-  const orderId  = '#VZ-' + Date.now().toString().slice(-6);
+  const orderId  = 'VZ-' + Date.now().toString().slice(-6);
   const zk       = TOWNSHIP_ZONE[selectedTownship];
-  const date     = new Date().toLocaleString('en-GB', { timeZone: 'Asia/Yangon' });
+  const date     = new Date().toLocaleString('en-GB', { timeZone:'Asia/Yangon' });
 
   const orderData = {
-    orderId, name, phone, address,
-    township: selectedTownship,
-    zone:     zk ? DELIVERY_ZONES[zk].label : '',
-    note:     note || '',
-    payment:  selectedPayment,
-    items:    items.map(i => ({ name:i.name, icon:i.icon, qty:i.qty, price:i.price, total:i.price*i.qty })),
-    subtotal, deliveryFee, total,
-    status:   'pending',
+    orderId,
+    name,
+    phone,
+    address,
+    township:    selectedTownship,
+    zone:        zk ? DELIVERY_ZONES[zk].label : '',
+    note:        note || '',
+    payment:     selectedPayment,
+    items:       items.map(i => ({
+      name:  i.name,
+      icon:  i.icon,
+      qty:   i.qty,
+      price: i.price,
+      total: i.price * i.qty,
+    })),
+    subtotal,
+    deliveryFee,
+    total,
+    status: 'pending',
     date,
   };
 
-  // localStorage backup (always)
-  const saved = JSON.parse(localStorage.getItem('vz_orders') || '[]');
-  saved.push(orderData);
-  localStorage.setItem('vz_orders', JSON.stringify(saved));
-
-  // Firebase Firestore
-  let firestoreOk = false;
+  // ── FIRESTORE SAVE ──
   try {
-    if (typeof firebase !== 'undefined' && firebase.firestore) {
-      const db = firebase.firestore();
-      await db.collection('orders').add({
-        ...orderData,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      });
-      firestoreOk = true;
-      console.log('✓ Firestore saved');
-    } else {
-      console.warn('Firebase not loaded');
-    }
-  } catch(e) {
-    console.error('Firestore error:', e.code, e.message);
+    const db = getDB();
+    const docRef = await db.collection('orders').add({
+      ...orderData,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    console.log('✓ Firestore order saved:', docRef.id);
+  } catch(err) {
+    console.error('✗ Firestore error:', err.code, err.message);
+    // localStorage backup
+    const saved = JSON.parse(localStorage.getItem('vz_orders') || '[]');
+    saved.push(orderData);
+    localStorage.setItem('vz_orders', JSON.stringify(saved));
   }
 
-  // Telegram notify
+  // ── TELEGRAM ──
   sendTelegram(orderData);
 
+  // ── DONE ──
   cart = []; saveCart();
   showConfirm(orderData);
   showStep(3);
+  if (btn) { btn.disabled = false; btn.textContent = 'PLACE ORDER →'; }
 }
 window.placeOrder = placeOrder;
 
 // ── TELEGRAM ──
 async function sendTelegram(order) {
   if (TELEGRAM_BOT_TOKEN === 'YOUR_BOT_TOKEN_HERE') return;
-  const pl = { cod:'Cash on Delivery 🚚', kbzpay:'KBZPay 📱', wavepay:'WavePay 💜' };
-  const items = order.items.map(i => '  • ' + i.icon + ' ' + i.name + ' x' + i.qty + ' — ' + (i.price * i.qty).toLocaleString() + ' MMK').join('\n');
+  const pl   = { cod:'Cash on Delivery 🚚', kbzpay:'KBZPay 📱', wavepay:'WavePay 💜' };
+  const items = order.items.map(i =>
+    '  • ' + i.icon + ' ' + i.name + ' x' + i.qty + ' — ' + (i.price * i.qty).toLocaleString() + ' MMK'
+  ).join('\n');
   const msg = [
     '🛒 *NEW ORDER — VibeZee*',
     '━━━━━━━━━━━━━━━━━━━',
@@ -319,6 +330,7 @@ async function sendTelegram(order) {
     '• ' + order.phone,
     '• ' + order.address,
     '• ' + order.township + ' (' + order.zone + ')',
+    order.note ? '• Note: ' + order.note : '',
     '',
     '🛍 *Items*',
     items,
@@ -328,40 +340,60 @@ async function sendTelegram(order) {
     '• Delivery: ' + order.deliveryFee.toLocaleString() + ' MMK',
     '• *Total: ' + order.total.toLocaleString() + ' MMK*',
     '• ' + (pl[order.payment] || order.payment),
-    order.note ? '\n📝 ' + order.note : '',
     '━━━━━━━━━━━━━━━━━━━',
     '✅ PENDING',
-  ].join('\n');
+  ].filter(Boolean).join('\n');
 
   try {
     await fetch('https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type':'application/json' },
       body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: msg, parse_mode: 'Markdown' }),
     });
   } catch(e) { console.warn('Telegram failed:', e); }
 }
 
-// ── CONFIRM ──
+// ── CONFIRM PAGE ──
 function showConfirm(order) {
   const pl = { cod:'Cash on Delivery', kbzpay:'KBZPay', wavepay:'WavePay' };
   const el = document.getElementById('confirmDetails');
   if (!el) return;
   el.innerHTML = [
-    ['Order ID', order.orderId],
-    ['Name',     order.name],
-    ['Phone',    order.phone],
-    ['Township', order.township],
-    ['Zone',     order.zone],
-    ['Payment',  pl[order.payment] || order.payment],
-    ['Subtotal', order.subtotal.toLocaleString() + ' MMK'],
-    ['Delivery', order.deliveryFee.toLocaleString() + ' MMK'],
-    ['Total',    '<span style="color:var(--green);font-weight:700;">' + order.total.toLocaleString() + ' MMK</span>'],
-    ['Status',   '<span class="status-pending">PENDING</span>'],
-  ].map(([k,v]) => `<div class="confirm-row"><span>${k}</span><span class="confirm-val">${v}</span></div>`).join('');
+    ['Order ID',  order.orderId],
+    ['Name',      order.name],
+    ['Phone',     order.phone],
+    ['Township',  order.township],
+    ['Zone',      order.zone],
+    ['Payment',   pl[order.payment] || order.payment],
+    ['Subtotal',  order.subtotal.toLocaleString() + ' MMK'],
+    ['Delivery',  order.deliveryFee.toLocaleString() + ' MMK'],
+    ['Total',     '<span style="color:var(--green);font-weight:700;">' + order.total.toLocaleString() + ' MMK</span>'],
+    ['Status',    '<span class="status-pending">PENDING</span>'],
+  ].map(([k,v]) =>
+    '<div class="confirm-row"><span>' + k + '</span><span class="confirm-val">' + v + '</span></div>'
+  ).join('');
 
   const msg = document.getElementById('confirmMsg');
   if (msg) msg.textContent = 'မှာယူမှု အောင်မြင်ပါသည်။ မကြာမီ ဆက်သွယ်ပေးပါမည်။ ကျေးဇူးတင်ပါသည်! 🙏';
+}
+
+// ── CUSTOM CONFIRM DIALOG ──
+function vzConfirm(icon, title, msg, confirmText, onConfirm) {
+  const overlay = document.createElement('div');
+  overlay.className = 'vz-overlay';
+  overlay.innerHTML =
+    '<div class="vz-dialog">' +
+    '<div class="vz-dialog-icon">' + icon + '</div>' +
+    '<div class="vz-dialog-title">' + title + '</div>' +
+    '<div class="vz-dialog-msg">' + msg + '</div>' +
+    '<div class="vz-dialog-btns">' +
+    '<button class="vz-btn-cancel" id="vzCancel">CANCEL</button>' +
+    '<button class="vz-btn-confirm" id="vzConfirmBtn">' + confirmText + '</button>' +
+    '</div></div>';
+  document.body.appendChild(overlay);
+  overlay.querySelector('#vzCancel').onclick    = () => overlay.remove();
+  overlay.querySelector('#vzConfirmBtn').onclick = () => { overlay.remove(); onConfirm(); };
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
 }
 
 // ── TOAST ──
@@ -373,36 +405,19 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-// ── CUSTOM CONFIRM ──
-function vzConfirm(icon, title, msg, confirmText, onConfirm) {
-  const overlay = document.createElement('div');
-  overlay.className = 'vz-overlay';
-  overlay.innerHTML = `
-    <div class="vz-dialog">
-      <div class="vz-dialog-icon">${icon}</div>
-      <div class="vz-dialog-title">${title}</div>
-      <div class="vz-dialog-msg">${msg}</div>
-      <div class="vz-dialog-btns">
-        <button class="vz-btn-cancel" id="vzCancel">CANCEL</button>
-        <button class="vz-btn-confirm" id="vzConfirmBtn">${confirmText}</button>
-      </div>
-    </div>
-  `;
-  document.body.appendChild(overlay);
-  document.getElementById('vzCancel').onclick    = () => overlay.remove();
-  document.getElementById('vzConfirmBtn').onclick = () => { overlay.remove(); onConfirm(); };
-  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
-}
-
 // ── INIT ──
 document.addEventListener('DOMContentLoaded', function() {
   const user = localStorage.getItem('vz_user');
   if (!user) { window.location.href = 'login.html'; return; }
 
+  // init firebase db
+  _db = firebase.firestore();
+
   renderCart();
   buildTownshipDropdown();
   showStep(1);
   selectPayment('cod');
-
-  document.querySelectorAll('.cart-count').forEach(el => el.textContent = cart.length);
+  document.querySelectorAll('.cart-count').forEach(el => {
+    el.textContent = cart.length;
+  });
 });
