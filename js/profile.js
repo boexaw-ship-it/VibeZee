@@ -96,7 +96,7 @@ function renderOrders(orders) {
       + (o.items?.length > 2 ? ' +' + (o.items.length-2) + ' more' : '');
     const encoded = encodeURIComponent(JSON.stringify(o));
     const canCancel = o.status === 'pending' || !o.status;
-    const canDelete = o.status === 'delivered' || o.status === 'cancelled';
+    const canDelete = o.status === 'delivered' || o.status === 'confirmed' || o.status === 'cancelled';
 
     return `
       <div class="order-card">
